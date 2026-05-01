@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>986 Boxster — Color & Wheel Ranking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<style>
+  @font-face {
+    font-family: 'Porscha';
+    src: url('fonts/911porschav3title.ttf') format('truetype');
+    font-display: swap;
+    font-weight: normal;
+    font-style: normal;
+  }
+  :root {
+    --bg: #0e0e10;
+    --surface: #16161a;
+    --surface-2: #1d1d22;
+    --line: #2a2a30;
+    --ink: #f4f3ee;
+    --ink-soft: #a8a6a0;
+    --accent: #ff5d3a;
+    --accent-soft: #ff8a6a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Satoshi', -apple-system, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+  header {
+    padding: 48px 32px 24px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: rgba(14,14,16,0.92);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+  }
+  h1 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 500;
+    font-size: 42px;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  h1 .wordmark {
+    font-family: 'Porscha', 'EB Garamond', serif;
+    font-style: normal;
+    font-weight: normal;
+    color: var(--accent);
+    font-size: 1.15em;
+    letter-spacing: 0;
+    margin: 0 0.08em;
+    vertical-align: -0.04em;
+  }
+  .subtitle {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 0;
+  }
+  nav {
+    margin-top: 16px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  nav a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 4px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover, nav a.active { color: var(--ink); border-color: var(--accent); }
+  nav .spacer { flex: 1; }
+  button.action {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  button.action:hover { border-color: var(--accent); color: var(--accent); }
+  main { padding: 32px; max-width: 1400px; margin: 0 auto; }
+  section { margin-bottom: 64px; }
+  section h2 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: 28px;
+    margin: 0 0 8px;
+    letter-spacing: -0.005em;
+  }
+  section p.intro {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 0 0 24px;
+    max-width: 640px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0;
+    cursor: grab;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .card.dragging { opacity: 0.5; cursor: grabbing; }
+  .rank {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(14,14,16,0.85);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 2;
+  }
+  .swatch {
+    width: 100%;
+    height: 140px;
+    background: var(--swatch, #444);
+    position: relative;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .swatch.metallic {
+    background: linear-gradient(135deg, var(--swatch) 0%, color-mix(in srgb, var(--swatch) 75%, white 25%) 50%, var(--swatch) 100%);
+  }
+  .swatch.pearl {
+    background: linear-gradient(135deg, var(--swatch) 0%, color-mix(in srgb, var(--swatch) 60%, white 40%) 30%, var(--swatch) 60%, color-mix(in srgb, var(--swatch) 80%, #ffd 20%) 100%);
+  }
+  .swatch.solid { background: var(--swatch); }
+  .wheel-img {
+    width: 100%;
+    height: 140px;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .body { padding: 12px 14px 14px; }
+  .name {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0 0 4px;
+  }
+  .meta {
+    color: var(--ink-soft);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    margin-right: 4px;
+    font-size: 10px;
+  }
+  .tag.special { color: var(--accent); border-color: var(--accent); }
+  .tag.metallic { color: #b8c5d6; border-color: #4a5468; }
+  .tag.pearl { color: #d6c5b8; border-color: #685a4a; }
+  .tag.solid { color: var(--ink-soft); }
+  a.photo-link {
+    display: inline-block;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    margin-top: 4px;
+  }
+  a.photo-link:hover { border-color: var(--accent); }
+  .export-out {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+  }
+  .export-out.visible { display: block; }
+  footer {
+    padding: 32px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 12px;
+    text-align: center;
+  }
+  footer a { color: var(--accent-soft); }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8,8,10,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 100;
+    display: none;
+    overflow-y: auto;
+    padding: 32px;
+  }
+  .modal-backdrop.open { display: block; }
+  .modal {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    animation: pop 0.2s ease-out;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 2;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .modal-title {
+    flex: 1;
+    min-width: 0;
+  }
+  .modal-title h3 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: 32px;
+    margin: 0 0 4px;
+    letter-spacing: -0.005em;
+  }
+  .modal-title p {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .modal-close {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-body {
+    padding: 24px 28px 28px;
+  }
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .img-tile {
+    aspect-ratio: 1;
+    background: var(--surface-2);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    transition: transform 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .img-tile:hover {
+    transform: scale(1.02);
+    border-color: var(--accent);
+  }
+  .img-tile.is-pinned {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .tile-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: zoom-in;
+  }
+  .img-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: var(--surface-2);
+    transition: opacity 0.3s;
+  }
+  .img-tile img.loaded { opacity: 1; }
+  .img-tile img.broken { opacity: 0.15; }
+  .pin-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(14,14,16,0.92);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: inherit;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.15s;
+    z-index: 2;
+  }
+  .img-tile:hover .pin-btn { opacity: 1; }
+  .pin-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .img-tile.is-pinned .pin-btn {
+    opacity: 1;
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  /* Pinned photo replaces the swatch on the card */
+  .swatch.pinned, .wheel-img.pinned {
+    background-size: cover;
+    background-position: center;
+    background-color: var(--surface-2);
+  }
+  .swatch.pinned { background-image: var(--bg-image); }
+  .wheel-img.pinned {
+    background-image: var(--bg-image);
+    color: transparent;
+  }
+  .unpin {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(14,14,16,0.85);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    padding: 0;
+    z-index: 2;
+  }
+  .swatch.pinned .unpin, .wheel-img.pinned .unpin {
+    display: inline-flex;
+  }
+  .unpin:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-status {
+    text-align: center;
+    padding: 24px;
+    color: var(--ink-soft);
+    font-size: 13px;
+    grid-column: 1 / -1;
+  }
+  .modal-status.error {
+    color: var(--accent);
+    border: 1px dashed var(--accent);
+    border-radius: 6px;
+    padding: 20px;
+  }
+  .modal-status code {
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+  .sentinel { height: 4px; grid-column: 1 / -1; }
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--line);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: -2px;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  body.modal-open { overflow: hidden; }
+
+  /* Lightbox — full-size image overlay above the gallery */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.94);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 40px;
+    cursor: zoom-out;
+    animation: fade-in 0.18s ease-out;
+  }
+  .lightbox.open { display: flex; }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    background: var(--surface-2);
+    cursor: zoom-out;
+    animation: zoom-in 0.2s ease-out;
+  }
+  @keyframes zoom-in {
+    from { transform: scale(0.92); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .lightbox-meta {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--ink-soft);
+    font-size: 12px;
+    background: rgba(14,14,16,0.85);
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 4px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    cursor: default;
+    max-width: calc(100% - 80px);
+  }
+  .lightbox-meta a {
+    color: var(--accent-soft);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .lightbox-meta a:hover { border-color: var(--accent-soft); }
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: rgba(14,14,16,0.85);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    font-family: inherit;
+  }
+  .lightbox-close:hover { border-color: var(--accent); color: var(--accent); }
+  .lightbox-pin {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .lightbox-pin:hover { border-color: var(--accent); color: var(--accent); }
+  .lightbox-pin.is-pinned { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+  /* Confidence badges */
+  .badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 3;
+    border: 1px solid var(--line);
+    background: rgba(14,14,16,0.85);
+    color: var(--ink-soft);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: help;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .badge:hover { transform: scale(1.05); }
+  .badge-3 { color: #7ed492; border-color: #2e5a3a; background: rgba(20, 40, 28, 0.92); }
+  .badge-2 { color: #d4c47e; border-color: #5a4f2e; background: rgba(40, 35, 20, 0.92); }
+  .badge-1 { color: #ff5d3a; border-color: #6b2818; background: rgba(40, 18, 14, 0.92); }
+
+  .tooltip {
+    position: absolute;
+    top: 38px;
+    right: 8px;
+    z-index: 5;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+    width: 280px;
+    max-width: calc(100vw - 48px);
+    font-size: 11px;
+    color: var(--ink);
+    line-height: 1.5;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+  }
+  .tooltip.open { display: block; pointer-events: auto; }
+  .tt-section { margin-bottom: 10px; }
+  .tt-section:last-child { margin-bottom: 0; }
+  .tt-label {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .tt-sources, .tt-conflicts ul {
+    margin: 0;
+    padding-left: 16px;
+    list-style: none;
+  }
+  .tt-sources li {
+    position: relative;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .tt-sources li::before {
+    content: '✓';
+    position: absolute;
+    left: -14px;
+    color: #7ed492;
+  }
+  .tt-conflicts {
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+  .tt-conflicts ul li {
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    padding-left: 0;
+  }
+  .tt-conflicts ul li::before {
+    content: '!';
+    color: var(--accent);
+    margin-right: 6px;
+    font-weight: 700;
+  }
+
+  /* Filter toggle */
+  .filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-toggle input { display: none; }
+  .filter-toggle .check {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: transparent;
+    transition: all 0.15s;
+  }
+  .filter-toggle input:checked ~ .check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+  .filter-toggle input:checked ~ .check::before {
+    content: '✓';
+    font-weight: 700;
+  }
+  .filter-toggle:hover { color: var(--ink); }
+
+  /* Verified-only hides cards with fewer than 3 confirming sources */
+  body.verified-only #color-grid .card[data-conf="1"],
+  body.verified-only #color-grid .card[data-conf="2"] { display: none; }
+
+  .renamed-flag {
+    display: inline-block;
+    background: rgba(255, 93, 58, 0.12);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-left: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>986 <span class="wordmark">Boxster</span> — color & wheel ranking</h1>
+  <p class="subtitle">Drag to reorder. Auto-saves to your browser.</p>
+  <nav>
+    <a href="#colors" class="active">Colors <span id="color-count" style="opacity:0.6;font-size:11px"></span></a>
+    <a href="#wheels">OEM Wheels</a>
+    <label class="filter-toggle" title="Hide colors with fewer than 3 confirming sources">
+      <input type="checkbox" id="verified-only">
+      <span class="check"></span>
+      <span>Verified only (3+ sources)</span>
+    </label>
+    <span class="spacer"></span>
+    <button class="action" onclick="exportRanking()">Export ranking</button>
+    <button class="action" onclick="resetRanking()">Reset</button>
+  </nav>
+  <div id="export-out" class="export-out"></div>
+</header>
+
+<main>
+
+<section id="colors">
+  <h2>Exterior colors</h2>
+  <p class="intro">Factory paint options offered on the 986 (1997–2004), triangulated across 5 source types. Each card shows a confirmation badge — click it for sources and conflicts. Hex swatches are approximations; "View gallery" pulls live photos. Full audit trail in <a href="colors-provenance.md" style="color: var(--accent-soft);">colors-provenance.md</a>.</p>
+  <div class="grid" id="color-grid"></div>
+</section>
+
+<section id="wheels">
+  <h2>OEM wheel designs</h2>
+  <p class="intro">Factory wheel options offered on the 986. Naming gets fuzzy in the enthusiast community — some designs go by multiple names. Click "see real photos" for visual reference.</p>
+  <div class="grid" id="wheel-grid"></div>
+</section>
+
+</main>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Full-size image">
+  <button class="lightbox-close" id="lightbox-close" aria-label="Close full-size view" type="button">×</button>
+  <img id="lightbox-img" src="" alt="">
+  <div class="lightbox-meta">
+    <button class="lightbox-pin" type="button" id="lightbox-pin">Pin as primary</button>
+    <a href="" target="_blank" rel="noopener" id="lightbox-source">Open source ↗</a>
+    <span style="color: var(--ink-soft); font-size: 11px;">ESC to close</span>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-name">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <h3 id="modal-name"></h3>
+        <p id="modal-meta"></p>
+      </div>
+      <button class="modal-close" onclick="closeGallery()" aria-label="Close gallery">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="image-grid" id="image-grid"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Sources: <a href="https://986porsche.com/porsche-boxster-986-colors/?lang=en">986porsche.com</a> · <a href="https://www.paintscratch.com/touch_up_paint/Porsche/Boxster.html">PaintScratch</a> · <a href="https://www.automotivetouchup.com/touch-up-paint/porsche/">AutomotiveTouchup</a> · <a href="https://www.pca.org/news/unicorn-colors-the-porsche-986-996-edition">PCA Unicorn Colors</a> · <a href="https://www.autopedia.com/Porsc/98_BoxstOpt.html">Autopedia 1998 dealer sheet</a> · Photos via Bing
+</footer>
+
+<script>
+// Source slugs — full names rendered in tooltips
+const SOURCES = {
+  "986p":  "986porsche.com",
+  "PS01":  "PaintScratch — 2001",
+  "PS02":  "PaintScratch — 2002",
+  "PS03":  "PaintScratch — 2003",
+  "PS04":  "PaintScratch — 2004",
+  "ATU97": "AutomotiveTouchup — 1997",
+  "ATU98": "AutomotiveTouchup — 1998",
+  "ATU99": "AutomotiveTouchup — 1999",
+  "ATU00": "AutomotiveTouchup — 2000",
+  "ATU01": "AutomotiveTouchup — 2001",
+  "ATU02": "AutomotiveTouchup — 2002",
+  "ATU03": "AutomotiveTouchup — 2003",
+  "ATU04": "AutomotiveTouchup — 2004",
+  "986F":  "986 Forum complete color gallery",
+  "Auto98":"Autopedia 1998 dealer options sheet",
+  "PCA":   "Porsche Club of America — Unicorn Colors of the 986/996",
+  "Stutt": "Stuttcars 2004 LE article"
+};
+
+const colors = [
+  // Whites
+  { name: "Snow White / Glacier White", code: "3AU/3AT", type: "solid", years: "1997–1999", hex: "#F2F2EE", family: "white",
+    sources: ["986p","Auto98"], conflicts: ["986porsche calls it Snow White; 1998 Porsche dealer options sheet calls it Glacier White (code Z1)."] },
+  { name: "Biarritz White", code: "9A2/9A3", type: "solid", years: "2000–2001", hex: "#EDEEEC", family: "white",
+    sources: ["986p","ATU00","PS01"], conflicts: [] },
+  { name: "Carrara White", code: "B9A", type: "solid", years: "2002–2004", hex: "#E5E5DE", family: "white",
+    sources: ["986p","PS03"], conflicts: ["PaintScratch 2002 page calls B9A 'Candy White' — outlier; all other sources confirm Carrara White."] },
+  // Yellows
+  { name: "Pastel Yellow", code: "12M/12L", type: "solid", years: "1997–1999", hex: "#F4D442", family: "yellow",
+    sources: ["986p","Auto98","PCA","986F"], conflicts: [] },
+  { name: "Speed Yellow", code: "12H/12G", type: "solid", years: "1997–2004", hex: "#FFCE00", family: "yellow",
+    sources: ["986p","PS01","PS02","PS03","PS04","ATU00","986F","PCA"], conflicts: [] },
+  { name: "Fayence Yellow", code: "1C1", type: "solid", years: "2004", hex: "#E8B536", family: "yellow",
+    sources: ["986p"], conflicts: ["Single source — not confirmed in PaintScratch's 2004 list or AutomotiveTouchup. May be a regional/special-order option or a 986porsche error."] },
+  // Orange
+  { name: "Zanzibar Red", code: "1A8/1A9", type: "pearl", years: "2000–2003", hex: "#C8472D", family: "orange",
+    sources: ["986p","PS04","PCA"], conflicts: ["PCA describes it as 'more of a blood orange'; categorized under reds in some sources, orange in others."] },
+  // Reds
+  { name: "Guards Red", code: "84A/80K", type: "solid", years: "1997–2004", hex: "#CE1126", family: "red",
+    sources: ["986p","PS01","PS02","PS03","ATU00","ATU03","Auto98"], conflicts: [] },
+  { name: "Arena Red Pearl", code: "84S/84R", type: "pearl", years: "1997–2000", hex: "#7A2A2E", family: "red",
+    sources: ["986p","Auto98"], conflicts: ["Code disagreement: 986porsche says 84S/84R; 1998 dealer sheet says H8. ATU 2000 lists Arena Red as M5W which conflicts with later Lapis Blue M5W — likely an ATU error."] },
+  { name: "Orient Red Metallic", code: "8A3/8A4", type: "metallic", years: "2001–2003", hex: "#5C1B22", family: "red",
+    sources: ["986p","PS01","PS02","PS03","ATU01","ATU02"], conflicts: [] },
+  { name: "Carmon Red Metallic", code: "M3W / 8B1 / 8B2", type: "metallic", years: "2003–2004", hex: "#7C2330", family: "red",
+    sources: ["986p","ATU03","ATU04"], conflicts: ["986porsche calls it 'Carmona'; PaintScratch and AutomotiveTouchup both call it 'Carmon'. Latter is consensus."] },
+  // Greens
+  { name: "Ocean Jade Metallic / Libel Turquoise", code: "25K/25H", type: "metallic", years: "1997–1999", hex: "#4A8A85", family: "green",
+    sources: ["986p","Auto98","PCA","986F"], conflicts: ["986porsche calls it 'Libel Turquoise'; the 1998 Porsche dealer sheet and PCA call it 'Ocean Jade Metallic' (or 'Ocean Metallic Jade'). Likely the same color, two names. PCA notes it as a 'unicorn color'."] },
+  { name: "Wimbledon Green Metallic", code: "2B6/23I", type: "metallic", years: "1999–2001", hex: "#2D4A2A", family: "green",
+    sources: ["986p","ATU00"], conflicts: [] },
+  { name: "Forest Green Metallic", code: "2B4/22E", type: "metallic", years: "1999–2004", hex: "#1A4A33", family: "green",
+    sources: ["986p","PS01","PS02","PS03","ATU00","ATU04"], conflicts: [] },
+  { name: "Rainforest Green Metallic", code: "2A1/2A2", type: "metallic", years: "2000–2002", hex: "#1F3A2B", family: "green",
+    sources: ["986p","PS01","PS02","ATU00","ATU01","ATU02","ATU03"], conflicts: ["986porsche labels this 'Jungle Green' but every other source uses 'Rainforest Green'. Renamed to consensus."] },
+  { name: "Dark Teal Metallic", code: "M6W", type: "metallic", years: "2003–2004", hex: "#0E3640", family: "green",
+    sources: ["986p","PS03","ATU02","ATU03","ATU04"], conflicts: ["986porsche calls it 'Lagoon Green'; PaintScratch and AutomotiveTouchup both use 'Dark Teal'. Latter is consensus."] },
+  // Blues
+  { name: "Blue Turquoise", code: "3AS/3AR", type: "solid", years: "1997–1998", hex: "#5BA9B0", family: "blue",
+    sources: ["986p"], conflicts: ["Single source — no PaintScratch or AutomotiveTouchup confirmation. Possibly a 986porsche translation of another color name."] },
+  { name: "Zenith Blue Metallic", code: "3AX/3AW", type: "metallic", years: "1997–2000", hex: "#2B4571", family: "blue",
+    sources: ["986p","ATU00","Auto98"], conflicts: [] },
+  { name: "Ocean Blue Metallic / Oceanblau", code: "3AZ/3AY", type: "metallic", years: "1997–2004", hex: "#1E3A5F", family: "blue",
+    sources: ["986p","ATU97","ATU98","ATU99","ATU00","ATU01","ATU02","ATU03","ATU04","Auto98"], conflicts: ["986porsche claims years 1997–2000; ATU shows it persisted through 2004. Year range expanded based on ATU."] },
+  { name: "Cobalt Blue Metallic", code: "3C8/37U", type: "metallic", years: "1999–2004", hex: "#1F3D7A", family: "blue",
+    sources: ["986p","PS01","PS02","PS03","PS04","ATU97","ATU98","ATU99","ATU00","ATU01","ATU02","ATU03","ATU04"], conflicts: [] },
+  { name: "Midnight Blue Pearl / Nachtblau", code: "39C/37W", type: "pearl", years: "1999–2004", hex: "#0E1B33", family: "blue",
+    sources: ["986p","PS01","PS02","PS03","PS04","ATU00","ATU04"], conflicts: [] },
+  { name: "Iris Blue Pearl / Irisblau", code: "39V/39N", type: "pearl", years: "1997–2000", hex: "#4D6B9C", family: "blue",
+    sources: ["986p","ATU97","ATU98","ATU99","ATU00"], conflicts: ["986porsche claims years 1999–2000; ATU shows it from 1997. Year range expanded."] },
+  { name: "Dark Blue", code: "3C7/347", type: "solid", years: "1999–2001", hex: "#1B2D4A", family: "blue",
+    sources: ["986p","ATU00"], conflicts: [] },
+  { name: "Lapis Blue Metallic", code: "3A8/3A9 + M5W", type: "metallic", years: "2001–2004", hex: "#1F4778", family: "blue",
+    sources: ["986p","PS01","PS02","PS03","PS04","ATU01","ATU02","ATU03","ATU04"], conflicts: ["Two paint codes are aliases for the same color — early 3A8/3A9, later M5W. ATU 2004 confirms aliasing. PaintScratch 2003 calls it 'Lapis Blue Pearl' (finish-name variation)."] },
+  // Violet
+  { name: "Viola Metallic / Violet Blue", code: "3AE/39G", type: "metallic", years: "1999–2001", hex: "#4A3A66", family: "violet",
+    sources: ["986p","ATU00","PCA"], conflicts: ["PCA calls it 'Violet Blue Metallic' and notes it's more typically a 996 color; rare on Boxster."] },
+  // Silvers
+  { name: "Arctic Silver Metallic", code: "92U/92T", type: "metallic", years: "1997–2004", hex: "#C0C2C5", family: "silver",
+    sources: ["986p","PS01","PS02","PS03","PS04","ATU00","ATU04","Auto98"], conflicts: [] },
+  { name: "Polar Silver Metallic", code: "92M/92E", type: "metallic", years: "1999–2004", hex: "#A0A5A8", family: "silver",
+    sources: ["986p","PS02","PS03","ATU00","ATU04"], conflicts: [] },
+  { name: "Mirage Pearl / Paladio", code: "555/554", type: "pearl", years: "1998–2000", hex: "#B5B0A8", family: "silver",
+    sources: ["986p","PCA"], conflicts: ["Doesn't appear in PaintScratch or AutomotiveTouchup year listings, but PCA confirms it as a real (rare) 986 color. German name: Paladio."] },
+  { name: "Meridian Metallic", code: "6A6/6A7", type: "metallic", years: "2001–2004", hex: "#7A8285", family: "silver",
+    sources: ["986p","PS01","PS02","ATU97","ATU98","ATU99","ATU00","ATU01","ATU02","ATU03","ATU04"], conflicts: ["986porsche claims 2001+ start; ATU shows it available from 1997. Year range may need adjustment."] },
+  { name: "GT Silver Metallic", code: "M7Z", type: "metallic", years: "2004 (50 Jahre 550 LE)", hex: "#95989B", family: "silver", special: true,
+    sources: ["986p","Stutt","ATU02","ATU03","ATU04"], conflicts: ["986porsche and Stuttcars agree it was used on the 2004 Boxster S 550 Spyder 50th Anniversary Edition (1,953 cars built). ATU lists it from 2002, possibly aggregator noise."] },
+  // Greys
+  { name: "Vesuvio Metallic", code: "40X/40W", type: "pearl", years: "1998–2000", hex: "#6E6F71", family: "grey",
+    sources: ["986p","PCA"], conflicts: ["Doesn't appear in PaintScratch or AutomotiveTouchup year listings, but PCA confirms it. PCA notes: looks dark gray, reveals strong purple in light."] },
+  { name: "Slate Grey Metallic", code: "23F/22D", type: "metallic", years: "1999–2004", hex: "#4A4D52", family: "grey",
+    sources: ["986p","PS01","PS02","PS03","PS04","ATU98","ATU99","ATU00","ATU01","ATU02","ATU03","ATU04"], conflicts: [] },
+  { name: "Seal Grey Metallic", code: "6B4/6B5", type: "metallic", years: "2001–2004", hex: "#5E6266", family: "grey",
+    sources: ["986p","PS02","PS03","PS04","ATU97","ATU98","ATU99","ATU00","ATU01","ATU02","ATU03","ATU04"], conflicts: ["986porsche claims 2001+ start; ATU shows it from 1997. Likely a 986porsche error."] },
+  { name: "Atlas Grey Metallic", code: "M7X", type: "metallic", years: "2004", hex: "#6F7378", family: "grey",
+    sources: ["986p","PS04","ATU02","ATU03","ATU04"], conflicts: [] },
+  // Blacks
+  { name: "Black / Schwarz", code: "741/747/041", type: "solid", years: "1997–2004", hex: "#0A0A0A", family: "black",
+    sources: ["986p","PS01","PS02","PS03","PS04","ATU00","ATU03","ATU04","Auto98"], conflicts: [] },
+  { name: "Black Metallic", code: "744/746", type: "metallic", years: "1997–2001", hex: "#1A1A1C", family: "black",
+    sources: ["986p","Auto98"], conflicts: ["1998 dealer sheet lists 'Metallic Black' (code Z8) which matches. ATU lists '738/744 = Basalt Black Pearl' which may be a different color or a code-system overlap."] },
+  { name: "Basalt Black Metallic", code: "C9Z", type: "metallic", years: "2002–2004", hex: "#14171A", family: "black",
+    sources: ["986p","PS03","PS04","ATU03","ATU04"], conflicts: ["PaintScratch 2002 page calls it 'Black Magic Pearl Metallic' — outlier; all other sources confirm Basalt Black Metallic."] }
+];
+
+const wheels = [
+  { name: "Boxster (16\")", years: "1997–1999 base", details: "Original 5-spoke star, 16-inch standard wheel." },
+  { name: "Boxster (17\")", years: "2000–2004 base", details: "Updated 5-spoke star, standard on later base 986." },
+  { name: "Cup 1 / Boxster S", years: "2000–2004 S", details: "17-inch 5-spoke flat-face. Standard on Boxster S." },
+  { name: "Cup 2", years: "1997–2004 option", details: "17-inch or 18-inch 5-spoke; popular factory upgrade." },
+  { name: "Carrera (Cup 3 style)", years: "1999–2004 option", details: "18-inch split 5-spoke, derived from Carrera-line." },
+  { name: "Sport Design", years: "1999–2004 option", details: "18-inch multi-spoke, originally a 996 GT3 design." },
+  { name: "Sport Classic II", years: "2002–2004 option", details: "18-inch 3-piece classic 5-spoke look." },
+  { name: "Sport Techno", years: "2001–2004 option", details: "18-inch dense multi-spoke (10-spoke mesh feel)." },
+  { name: "Turbo Look I (Turbo Twist)", years: "2000–2004 option", details: "18-inch twisted 5-spoke, named after 993 Turbo." },
+  { name: "Turbo Look II", years: "2002–2004 option", details: "Evolved twisted-spoke; cleaner outer rim." }
+];
+
+const STORE_KEY_COLORS = "porsche986_color_rank";
+const STORE_KEY_WHEELS = "porsche986_wheel_rank";
+const STORE_KEY_PINNED  = "porsche986_pinned_images";
+
+function getPinned() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY_PINNED) || '{}'); }
+  catch { return {}; }
+}
+function pinnedFor(name) { return getPinned()[name] || null; }
+function setPinned(name, url) {
+  const all = getPinned();
+  if (url) all[name] = url; else delete all[name];
+  localStorage.setItem(STORE_KEY_PINNED, JSON.stringify(all));
+}
+
+function searchUrl(query) {
+  return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`;
+}
+
+function attr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
+
+// Build a search query that puts the primary color name in quotes for tighter matching.
+// Uses the first variant if the name has " / " alternates.
+function buildColorQuery(name) {
+  const primary = name.split(' / ')[0].trim();
+  return `Porsche 986 Boxster "${primary}"`;
+}
+
+function buildWheelQuery(name) {
+  return `Porsche 986 Boxster "${name}" wheel OEM`;
+}
+
+// Confidence: 3 if 3+ unique sources AND no major conflicts; 2 if 2 sources; 1 if 1.
+// Code-system disagreements and naming variations don't count as "major" — they're noted but the color exists.
+// Major = "the color may not exist" or "year range fundamentally wrong".
+function confidence(c) {
+  const n = (c.sources || []).length;
+  if (n >= 3) return 3;
+  if (n === 2) return 2;
+  return 1;
+}
+
+const BADGE = { 3: '✓✓✓', 2: '✓✓', 1: '!' };
+const BADGE_LABEL = { 3: 'Verified — 3+ sources', 2: 'Two sources', 1: 'Single source — unverified' };
+
+function sourceList(c) {
+  return (c.sources || []).map(s => SOURCES[s] || s);
+}
+
+function swatchHtml(c) {
+  const pinned = pinnedFor(c.name);
+  if (pinned) {
+    return `<div class="swatch pinned" style="--bg-image: url('${attr(pinned)}');">
+      <button class="unpin" type="button" data-unpin="${attr(c.name)}" aria-label="Remove pinned photo" title="Remove pinned photo">×</button>
+    </div>`;
+  }
+  return `<div class="swatch ${c.type}" style="--swatch: ${c.hex};"></div>`;
+}
+
+function wheelImgHtml(w) {
+  const pinned = pinnedFor(w.name);
+  if (pinned) {
+    return `<div class="wheel-img pinned" style="--bg-image: url('${attr(pinned)}');">${w.name}
+      <button class="unpin" type="button" data-unpin="${attr(w.name)}" aria-label="Remove pinned photo" title="Remove pinned photo">×</button>
+    </div>`;
+  }
+  return `<div class="wheel-img">${w.name}</div>`;
+}
+
+function colorCard(c) {
+  const q = buildColorQuery(c.name);
+  const meta = `${c.code} · ${c.years}`;
+  const conf = confidence(c);
+  const sources = sourceList(c);
+  const conflicts = c.conflicts || [];
+  const tooltipHtml = `
+    <div class="tt-section">
+      <div class="tt-label">Confirmed by ${sources.length} source${sources.length === 1 ? '' : 's'}:</div>
+      <ul class="tt-sources">${sources.map(s => `<li>${s}</li>`).join('')}</ul>
+    </div>
+    ${conflicts.length ? `
+    <div class="tt-section tt-conflicts">
+      <div class="tt-label">Notes / conflicts:</div>
+      <ul>${conflicts.map(c => `<li>${c}</li>`).join('')}</ul>
+    </div>` : ''}
+  `;
+  return `
+    <div class="card" data-id="${attr(c.name)}" data-type="color" data-conf="${conf}">
+      <span class="rank"></span>
+      <button class="badge badge-${conf}" type="button" aria-label="${BADGE_LABEL[conf]}" title="${BADGE_LABEL[conf]} — click for details">${BADGE[conf]}</button>
+      <div class="tooltip">${tooltipHtml}</div>
+      ${swatchHtml(c)}
+      <div class="body">
+        <p class="name">${c.name}</p>
+        <p class="meta">${meta}</p>
+        <span class="tag ${c.type}">${c.type}</span>
+        ${c.special ? '<span class="tag special">Special</span>' : ''}
+        <br>
+        <a class="photo-link" href="#" data-name="${attr(c.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
+      </div>
+    </div>`;
+}
+
+function wheelCard(w) {
+  const q = buildWheelQuery(w.name);
+  const meta = w.years;
+  return `
+    <div class="card" data-id="${attr(w.name)}" data-type="wheel" data-conf="0">
+      <span class="rank"></span>
+      ${wheelImgHtml(w)}
+      <div class="body">
+        <p class="name">${w.name}</p>
+        <p class="meta">${meta}</p>
+        <p style="font-size: 12px; color: var(--ink-soft); margin: 0 0 8px;">${w.details}</p>
+        <a class="photo-link" href="#" data-name="${attr(w.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
+      </div>
+    </div>`;
+}
+
+// Re-render the swatch/wheel-img of a single card without disturbing rank order
+function refreshCardVisual(name) {
+  const card = document.querySelector(`.card[data-id="${name.replace(/"/g, '\\"')}"]`);
+  if (!card) return;
+  const isWheel = card.dataset.type === 'wheel';
+  const old = card.querySelector(isWheel ? '.wheel-img' : '.swatch');
+  if (!old) return;
+  let replacement;
+  if (isWheel) {
+    const w = wheels.find(x => x.name === name);
+    if (!w) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = wheelImgHtml(w);
+    replacement = tmp.firstElementChild;
+  } else {
+    const c = colors.find(x => x.name === name);
+    if (!c) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = swatchHtml(c);
+    replacement = tmp.firstElementChild;
+  }
+  old.replaceWith(replacement);
+}
+
+function applyOrder(items, savedOrder) {
+  if (!savedOrder) return items;
+  const map = new Map(items.map(i => [i.name, i]));
+  const ordered = [];
+  for (const id of savedOrder) {
+    if (map.has(id)) {
+      ordered.push(map.get(id));
+      map.delete(id);
+    }
+  }
+  return [...ordered, ...map.values()];
+}
+
+function renderRanks(gridId) {
+  const grid = document.getElementById(gridId);
+  let n = 0;
+  [...grid.children].forEach(card => {
+    const rankEl = card.querySelector('.rank');
+    if (!rankEl) return;
+    if (card.offsetParent === null) {
+      rankEl.textContent = '';
+    } else {
+      n += 1;
+      rankEl.textContent = n;
+    }
+  });
+}
+
+function saveOrder(gridId, key) {
+  const grid = document.getElementById(gridId);
+  const order = [...grid.children].map(c => c.dataset.id);
+  localStorage.setItem(key, JSON.stringify(order));
+}
+
+// ── Gallery modal ──────────────────────────────────────────────
+const galleryState = {
+  query: null,
+  page: 0,
+  loading: false,
+  done: false,
+  observer: null
+};
+
+function openGallery(ev, name, query, meta) {
+  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  document.getElementById('modal-name').textContent = name;
+  document.getElementById('modal-meta').textContent = `${meta} · searching: "${query}"`;
+  const grid = document.getElementById('image-grid');
+  grid.innerHTML = '';
+  galleryState.query = query;
+  galleryState.page = 0;
+  galleryState.loading = false;
+  galleryState.done = false;
+
+  document.getElementById('modal').classList.add('open');
+  document.body.classList.add('modal-open');
+  loadMoreImages();
+}
+
+function closeGallery() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.classList.remove('modal-open');
+  if (galleryState.observer) {
+    galleryState.observer.disconnect();
+    galleryState.observer = null;
+  }
+}
+
+async function loadMoreImages() {
+  if (galleryState.loading || galleryState.done) return;
+  galleryState.loading = true;
+  galleryState.page += 1;
+  const grid = document.getElementById('image-grid');
+
+  // Remove any existing sentinel/status before appending
+  grid.querySelectorAll('.modal-status, .sentinel').forEach(el => el.remove());
+
+  const status = document.createElement('div');
+  status.className = 'modal-status';
+  status.innerHTML = `<span class="spinner"></span>Loading page ${galleryState.page}…`;
+  grid.appendChild(status);
+
+  try {
+    const url = `/api/images?q=${encodeURIComponent(galleryState.query)}&page=${galleryState.page}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    status.remove();
+
+    const results = data.results || [];
+    if (results.length === 0) {
+      galleryState.done = true;
+      const end = document.createElement('div');
+      end.className = 'modal-status';
+      end.textContent = galleryState.page === 1 ? 'No images found.' : 'End of results.';
+      grid.appendChild(end);
+      galleryState.loading = false;
+      return;
+    }
+
+    const currentName = document.getElementById('modal-name').textContent;
+    const currentPinned = pinnedFor(currentName);
+    for (const r of results) {
+      const tile = document.createElement('div');
+      tile.className = 'img-tile';
+      if (r.full === currentPinned) tile.classList.add('is-pinned');
+      tile.dataset.full = r.full;
+      tile.dataset.thumb = r.thumb;
+
+      const link = document.createElement('a');
+      link.className = 'tile-link';
+      link.href = r.full;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.title = r.title || '';
+
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.src = r.thumb;
+      img.alt = r.title || '';
+      img.onload = () => img.classList.add('loaded');
+      img.onerror = () => img.classList.add('broken');
+
+      link.appendChild(img);
+      tile.appendChild(link);
+
+      const pinBtn = document.createElement('button');
+      pinBtn.type = 'button';
+      pinBtn.className = 'pin-btn';
+      pinBtn.dataset.action = 'pin';
+      pinBtn.textContent = (r.full === currentPinned) ? '✓ Pinned' : 'Pin as primary';
+      tile.appendChild(pinBtn);
+
+      grid.appendChild(tile);
+    }
+
+    // Add new sentinel for next page
+    const sentinel = document.createElement('div');
+    sentinel.className = 'sentinel';
+    grid.appendChild(sentinel);
+
+    if (galleryState.observer) galleryState.observer.disconnect();
+    galleryState.observer = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting) && !galleryState.loading && !galleryState.done) {
+        loadMoreImages();
+      }
+    }, { rootMargin: '400px' });
+    galleryState.observer.observe(sentinel);
+  } catch (err) {
+    status.className = 'modal-status error';
+    const isFetchFail = err.message?.includes('Failed to fetch') || err instanceof TypeError;
+    if (isFetchFail) {
+      status.innerHTML = `Image server isn't running.<br><br>Open Terminal in this folder and run:<br><code>python3 server.py</code><br><br>Then visit <code>http://localhost:3849/986-rank.html</code>`;
+    } else {
+      status.textContent = `Couldn't load images: ${err.message}`;
+    }
+    galleryState.loading = false;
+    galleryState.done = true;
+    return;
+  }
+  galleryState.loading = false;
+}
+
+document.getElementById('modal').addEventListener('click', (e) => {
+  // Only close when clicking the backdrop itself, not descendants
+  if (e.target === e.currentTarget) closeGallery();
+});
+
+// ── Lightbox ───────────────────────────────────────────────────
+const lightboxState = { fullUrl: null, sourceUrl: null };
+
+function openLightbox(fullUrl, sourceUrl) {
+  lightboxState.fullUrl = fullUrl;
+  lightboxState.sourceUrl = sourceUrl;
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightbox-img').src = fullUrl;
+  document.getElementById('lightbox-source').href = sourceUrl || fullUrl;
+  // Update pin button state to reflect current pin
+  const colorName = document.getElementById('modal-name').textContent;
+  const pinBtn = document.getElementById('lightbox-pin');
+  const isPinned = pinnedFor(colorName) === fullUrl;
+  pinBtn.classList.toggle('is-pinned', isPinned);
+  pinBtn.textContent = isPinned ? '✓ Pinned' : 'Pin as primary';
+  lb.classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-img').src = '';
+  lightboxState.fullUrl = null;
+  lightboxState.sourceUrl = null;
+}
+
+document.getElementById('lightbox').addEventListener('click', (e) => {
+  // Click on the meta bar shouldn't close
+  if (e.target.closest('.lightbox-meta')) return;
+  closeLightbox();
+});
+document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+document.getElementById('lightbox-pin').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const colorName = document.getElementById('modal-name').textContent;
+  const url = lightboxState.fullUrl;
+  if (!url || !colorName) return;
+  const isPinned = pinnedFor(colorName) === url;
+  setPinned(colorName, isPinned ? null : url);
+  // Refresh underlying card AND gallery tile states
+  refreshCardVisual(colorName);
+  document.querySelectorAll('.img-tile').forEach(t => {
+    const tileIsPinned = !isPinned && t.dataset.full === url;
+    t.classList.toggle('is-pinned', tileIsPinned);
+    const btn = t.querySelector('.pin-btn');
+    if (btn) btn.textContent = tileIsPinned ? '✓ Pinned' : 'Pin as primary';
+  });
+  // Refresh lightbox button itself
+  const pinBtn = document.getElementById('lightbox-pin');
+  pinBtn.classList.toggle('is-pinned', !isPinned);
+  pinBtn.textContent = isPinned ? 'Pin as primary' : '✓ Pinned';
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  // ESC chain: lightbox first, then gallery
+  if (document.getElementById('lightbox').classList.contains('open')) {
+    closeLightbox();
+  } else if (document.getElementById('modal').classList.contains('open')) {
+    closeGallery();
+  }
+});
+
+// Delegated click handler for gallery links (survives re-renders).
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('.photo-link');
+  if (link) {
+    e.preventDefault();
+    e.stopPropagation();
+    openGallery(null, link.dataset.name, link.dataset.query, link.dataset.meta);
+    return;
+  }
+
+  // Tile image click → open lightbox (preserve right-click open-in-new-tab via the underlying <a>)
+  const tileLink = e.target.closest('.tile-link');
+  if (tileLink && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+    e.preventDefault();
+    e.stopPropagation();
+    const tile = tileLink.closest('.img-tile');
+    openLightbox(tile.dataset.full, tileLink.href);
+    return;
+  }
+
+  // Pin button on a gallery tile — set image as primary for currently-open color/wheel
+  const pinBtn = e.target.closest('.pin-btn');
+  if (pinBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const tile = pinBtn.closest('.img-tile');
+    if (!tile) return;
+    const name = document.getElementById('modal-name').textContent;
+    const url = tile.dataset.full;
+    const isPinned = tile.classList.contains('is-pinned');
+    if (isPinned) {
+      setPinned(name, null);
+    } else {
+      setPinned(name, url);
+    }
+    // Update pinned state across all visible tiles
+    document.querySelectorAll('.img-tile').forEach(t => {
+      const wasPinned = t === tile && !isPinned;
+      t.classList.toggle('is-pinned', wasPinned);
+      const btn = t.querySelector('.pin-btn');
+      if (btn) btn.textContent = wasPinned ? '✓ Pinned' : 'Pin as primary';
+    });
+    refreshCardVisual(name);
+    return;
+  }
+
+  // Unpin × on a card swatch
+  const unpin = e.target.closest('.unpin');
+  if (unpin) {
+    e.preventDefault();
+    e.stopPropagation();
+    const name = unpin.dataset.unpin;
+    setPinned(name, null);
+    refreshCardVisual(name);
+    return;
+  }
+
+  // Badge click toggles tooltip; clicking elsewhere closes any open tooltip
+  const badge = e.target.closest('.badge');
+  if (badge) {
+    e.stopPropagation();
+    const tt = badge.parentElement.querySelector('.tooltip');
+    document.querySelectorAll('.tooltip.open').forEach(other => { if (other !== tt) other.classList.remove('open'); });
+    if (tt) tt.classList.toggle('open');
+    return;
+  }
+  if (!e.target.closest('.tooltip')) {
+    document.querySelectorAll('.tooltip.open').forEach(t => t.classList.remove('open'));
+  }
+});
+
+// Verified-only filter
+function updateColorCount() {
+  const all = document.querySelectorAll('#color-grid .card');
+  const visible = [...all].filter(c => c.offsetParent !== null).length;
+  document.getElementById('color-count').textContent = `(${visible}${visible !== all.length ? ` of ${all.length}` : ''})`;
+}
+
+document.getElementById('verified-only').addEventListener('change', (e) => {
+  document.body.classList.toggle('verified-only', e.target.checked);
+  renderRanks('color-grid');
+  updateColorCount();
+});
+
+function init() {
+  const savedColors = JSON.parse(localStorage.getItem(STORE_KEY_COLORS) || 'null');
+  const savedWheels = JSON.parse(localStorage.getItem(STORE_KEY_WHEELS) || 'null');
+
+  const orderedColors = applyOrder(colors, savedColors);
+  const orderedWheels = applyOrder(wheels, savedWheels);
+
+  document.getElementById('color-grid').innerHTML = orderedColors.map(colorCard).join('');
+  document.getElementById('wheel-grid').innerHTML = orderedWheels.map(wheelCard).join('');
+
+  renderRanks('color-grid');
+  renderRanks('wheel-grid');
+  updateColorCount();
+
+  Sortable.create(document.getElementById('color-grid'), {
+    animation: 180,
+    ghostClass: 'dragging',
+    onEnd: () => { renderRanks('color-grid'); saveOrder('color-grid', STORE_KEY_COLORS); }
+  });
+  Sortable.create(document.getElementById('wheel-grid'), {
+    animation: 180,
+    ghostClass: 'dragging',
+    onEnd: () => { renderRanks('wheel-grid'); saveOrder('wheel-grid', STORE_KEY_WHEELS); }
+  });
+}
+
+function exportRanking() {
+  const colorOrder = [...document.getElementById('color-grid').children].map(c => c.dataset.id);
+  const wheelOrder = [...document.getElementById('wheel-grid').children].map(c => c.dataset.id);
+  const pinned = getPinned();
+  const pinnedLines = Object.entries(pinned).map(([n, url]) => `  ${n}: ${url}`);
+
+  const text = `986 Boxster — Christy's Ranking
+Generated: ${new Date().toLocaleString()}
+
+═══════════════════════════════════════
+COLORS (best → worst)
+═══════════════════════════════════════
+${colorOrder.map((n, i) => `${(i+1).toString().padStart(2)}. ${n}${pinned[n] ? ' 📌' : ''}`).join('\n')}
+
+═══════════════════════════════════════
+OEM WHEELS (best → worst)
+═══════════════════════════════════════
+${wheelOrder.map((n, i) => `${(i+1).toString().padStart(2)}. ${n}${pinned[n] ? ' 📌' : ''}`).join('\n')}
+${pinnedLines.length ? `
+═══════════════════════════════════════
+PINNED PHOTOS
+═══════════════════════════════════════
+${pinnedLines.join('\n')}
+` : ''}`;
+  const out = document.getElementById('export-out');
+  out.textContent = text;
+  out.classList.add('visible');
+  navigator.clipboard?.writeText(text);
+}
+
+function resetRanking() {
+  const hasPinned = Object.keys(getPinned()).length > 0;
+  const msg = hasPinned
+    ? 'Reset rankings AND clear all pinned photos?'
+    : 'Reset both rankings to default order?';
+  if (!confirm(msg)) return;
+  localStorage.removeItem(STORE_KEY_COLORS);
+  localStorage.removeItem(STORE_KEY_WHEELS);
+  if (hasPinned) localStorage.removeItem(STORE_KEY_PINNED);
+  document.getElementById('export-out').classList.remove('visible');
+  init();
+}
+
+document.querySelectorAll('nav a').forEach(a => {
+  a.addEventListener('click', () => {
+    document.querySelectorAll('nav a').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+  });
+});
+
+init();
+</script>
+</body>
+</html>
