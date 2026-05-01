@@ -23,7 +23,7 @@ Two paths — pick whichever's friendlier.
 ### Option A: Plain Python (no extra tools)
 
 ```bash
-git clone https://github.com/christycarroll/rank-986.git
+git clone https://github.com/pollybagel-labs/rank-986.git
 cd rank-986
 python3 server.py
 ```
@@ -119,4 +119,4 @@ If Bing eventually rate-limits the function, swap to Brave Search API or SerpAPI
 
 ## License
 
-MIT — see [LICENSE](./LICENSE). Fork it, adapt it, share it. If you build a `rank-911` or `rank-944`, drop the link in [Issues](https://github.com/christycarroll/rank-986/issues) — I'd love to see it.
+MIT — see [LICENSE](./LICENSE). Fork it, adapt it, share it. If you build a `rank-911` or `rank-944`, drop the link in [Issues](https://github.com/pollybagel-labs/rank-986/issues) — I'd love to see it.
