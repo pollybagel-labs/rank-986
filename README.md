@@ -8,7 +8,7 @@ Built for fun. Triangulates color data across five source types (paint vendors, 
 
 ## What it does
 
-- **37 factory colors** with hex-approximation swatches, year ranges, paint codes, and source-confirmation badges
+- **35 factory colors** with hex-approximation swatches, year ranges, paint codes, and source-confirmation badges
 - **10 OEM wheel designs** with year + spec context
 - **Drag to reorder** anything — saves to your browser's localStorage
 - **Click "View gallery"** on any card to live-search photos via Bing — infinite scroll, in-page lightbox

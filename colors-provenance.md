@@ -115,6 +115,10 @@ Confidence rating: ✅ ≥3 sources agree · 🟡 2 sources, no conflict · ⚠�
 **Demote to "unverified" tier (only 1 source — keep but flag):**
 - Snow White, Pastel Yellow, Fayence Yellow, Arena Red Pearl, Libel Turquoise, Blue Turquoise, Mirage Pearl, Vesuvio Metallic, Black Metallic (744/746)
 
+**Removed from the live ranking on 2026-05-01** — colors floated only by 986porsche.com with zero corroborating evidence anywhere else. Pulled because the bar to be on the list is at least 2 source types:
+- **Fayence Yellow** (1C1, claimed for 2004) — not in PaintScratch's 2004 list, not in ATU 2004, no enthusiast forum mentions
+- **Blue Turquoise** (3AS/3AR, claimed for 1997–1998) — no vendor or enthusiast confirmation; possibly a 986porsche translation of "Libel Turquoise" or another color
+
 **Possibly add (confirmed in 1+ sources, missing from current list):**
 - *None definitively new for the 986 generation.* The "extra" colors that appeared on ATU late-986 pages (Crystal Silver, Sand White, Malachite Green, Jarama Beige) are 987-era cross-pollination, not real 986 colors.
 
