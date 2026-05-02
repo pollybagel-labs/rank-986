@@ -44,22 +44,28 @@
     backdrop-filter: blur(8px);
     z-index: 10;
   }
-  h1 {
-    font-family: 'EB Garamond', serif;
-    font-weight: 500;
-    font-size: 42px;
-    margin: 0 0 4px;
-    letter-spacing: -0.01em;
-  }
-  h1 .wordmark {
+  h1.stripe-title {
     font-family: 'Porscha', 'EB Garamond', serif;
-    font-style: normal;
     font-weight: normal;
+    color: var(--ink);
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    margin: 0 -32px 14px;            /* break out of header's 32px horizontal padding */
+    padding: 10px 32px 6px;          /* match the page-edge gutter back on the text */
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: 0.05em;
+    text-align: left;
+  }
+  h1.stripe-title .digit { letter-spacing: 0.02em; margin-right: 0.18em; }
+  p.title-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 26px;
+    margin: 0 0 6px;
     color: var(--accent);
-    font-size: 1.15em;
-    letter-spacing: 0;
-    margin: 0 0.08em;
-    vertical-align: -0.04em;
+    letter-spacing: -0.005em;
   }
   .subtitle {
     color: var(--ink-soft);
@@ -679,7 +685,8 @@
 <body>
 
 <header>
-  <h1>986 <span class="wordmark">Boxster</span> — color & wheel ranking</h1>
+  <h1 class="stripe-title"><span class="digit">986</span>BOXSTER</h1>
+  <p class="title-subtitle">color & wheel ranking</p>
   <p class="subtitle">Drag to reorder. Auto-saves to your browser.</p>
   <nav>
     <a href="#colors" class="active">Colors <span id="color-count" style="opacity:0.6;font-size:11px"></span></a>
