@@ -173,11 +173,16 @@
     font-size: 12px;
     font-weight: 700;
     z-index: 2;
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
+    cursor: text;
+    transition: border-color 0.15s, color 0.15s, background 0.15s, border-style 0.15s;
   }
-  .rank:hover { border-color: var(--accent); color: var(--accent); }
-  .rank.editing { border-color: var(--accent); background: var(--surface); }
+  .rank:hover {
+    border-color: var(--accent);
+    border-style: dashed;
+    color: var(--accent);
+    background: var(--surface);
+  }
+  .rank.editing { border-color: var(--accent); border-style: solid; background: var(--surface); }
   .rank-input {
     width: 100%;
     height: 100%;
@@ -358,6 +363,21 @@
     transition: all 0.15s;
   }
   .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+  .upload-btn {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
   .modal-body {
     padding: 24px 28px 28px;
   }
@@ -704,6 +724,40 @@
   body.verified-only #color-grid .card[data-conf="1"],
   body.verified-only #color-grid .card[data-conf="2"] { display: none; }
 
+  /* Hide-card: per-card "I don't care about this one" toggle */
+  body:not(.show-hidden) .card.is-hidden { display: none; }
+  .card.is-hidden { opacity: 0.45; }
+  .card.is-hidden::after {
+    content: 'HIDDEN';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--bg);
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    z-index: 4;
+    pointer-events: none;
+  }
+  .hide-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 12px;
+    font-family: inherit;
+    opacity: 0.55;
+    transition: opacity 0.15s, color 0.15s;
+  }
+  .hide-btn:hover { opacity: 1; color: var(--accent); }
+
   .renamed-flag {
     display: inline-block;
     background: rgba(255, 93, 58, 0.12);
@@ -731,6 +785,11 @@
       <input type="checkbox" id="verified-only">
       <span class="check"></span>
       <span>Verified only (3+ sources)</span>
+    </label>
+    <label class="filter-toggle" title="Show colors you've hidden">
+      <input type="checkbox" id="show-hidden">
+      <span class="check"></span>
+      <span>Show hidden <span id="hidden-count" style="opacity:0.6"></span></span>
     </label>
     <span class="spacer"></span>
     <button class="action" onclick="exportRanking()">Export ranking</button>
@@ -772,6 +831,8 @@
         <h3 id="modal-name"></h3>
         <p id="modal-meta"></p>
       </div>
+      <button class="upload-btn" id="upload-btn" type="button">Upload your own</button>
+      <input type="file" id="upload-input" accept="image/*" style="display:none">
       <button class="modal-close" onclick="closeGallery()" aria-label="Close gallery">×</button>
     </div>
     <div class="modal-body">
@@ -905,6 +966,7 @@ const wheels = [
 const STORE_KEY_COLORS = "porsche986_color_rank";
 const STORE_KEY_WHEELS = "porsche986_wheel_rank";
 const STORE_KEY_PINNED  = "porsche986_pinned_images";
+const STORE_KEY_HIDDEN  = "porsche986_hidden";
 
 function getPinned() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY_PINNED) || '{}'); }
@@ -915,6 +977,46 @@ function setPinned(name, url) {
   const all = getPinned();
   if (url) all[name] = url; else delete all[name];
   localStorage.setItem(STORE_KEY_PINNED, JSON.stringify(all));
+}
+
+function getHidden() {
+  try { return new Set(JSON.parse(localStorage.getItem(STORE_KEY_HIDDEN) || '[]')); }
+  catch { return new Set(); }
+}
+function isHidden(name) { return getHidden().has(name); }
+function setHidden(name, hidden) {
+  const all = getHidden();
+  if (hidden) all.add(name); else all.delete(name);
+  localStorage.setItem(STORE_KEY_HIDDEN, JSON.stringify([...all]));
+}
+function updateHiddenCount() {
+  const n = getHidden().size;
+  const el = document.getElementById('hidden-count');
+  if (el) el.textContent = n ? `(${n})` : '';
+}
+
+// Resize image client-side before storing — keeps localStorage manageable
+async function resizeImageToDataURL(file, maxDim = 800, quality = 0.85) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error('not an image'));
+    i.src = dataUrl;
+  });
+  const ratio = Math.min(maxDim / img.width, maxDim / img.height, 1);
+  const w = Math.round(img.width * ratio);
+  const h = Math.round(img.height * ratio);
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL('image/jpeg', quality);
 }
 
 function searchUrl(query) {
@@ -979,6 +1081,7 @@ function colorCard(c) {
   const conf = confidence(c);
   const sources = sourceList(c);
   const conflicts = c.conflicts || [];
+  const hidden = isHidden(c.name);
   const tooltipHtml = `
     <div class="tt-section">
       <div class="tt-label">Confirmed by ${sources.length} source${sources.length === 1 ? '' : 's'}:</div>
@@ -991,8 +1094,8 @@ function colorCard(c) {
     </div>` : ''}
   `;
   return `
-    <div class="card" data-id="${attr(c.name)}" data-type="color" data-conf="${conf}">
-      <span class="rank"></span>
+    <div class="card${hidden ? ' is-hidden' : ''}" data-id="${attr(c.name)}" data-type="color" data-conf="${conf}">
+      <span class="rank" title="Click to type a new rank"></span>
       <button class="badge badge-${conf}" type="button" aria-label="${BADGE_LABEL[conf]}" title="${BADGE_LABEL[conf]} — click for details">${BADGE[conf]}</button>
       <div class="tooltip">${tooltipHtml}</div>
       ${swatchHtml(c)}
@@ -1003,6 +1106,7 @@ function colorCard(c) {
         ${c.special ? '<span class="tag special">Special</span>' : ''}
         <br>
         <a class="photo-link" href="#" data-name="${attr(c.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
+        <button class="hide-btn" type="button" data-hide="${attr(c.name)}">${hidden ? 'unhide' : 'hide'}</button>
       </div>
     </div>`;
 }
@@ -1010,15 +1114,17 @@ function colorCard(c) {
 function wheelCard(w) {
   const q = buildWheelQuery(w.name);
   const meta = w.years;
+  const hidden = isHidden(w.name);
   return `
-    <div class="card" data-id="${attr(w.name)}" data-type="wheel" data-conf="0">
-      <span class="rank"></span>
+    <div class="card${hidden ? ' is-hidden' : ''}" data-id="${attr(w.name)}" data-type="wheel" data-conf="0">
+      <span class="rank" title="Click to type a new rank"></span>
       ${wheelImgHtml(w)}
       <div class="body">
         <p class="name">${w.name}</p>
         <p class="meta">${meta}</p>
         <p style="font-size: 12px; color: var(--ink-soft); margin: 0 0 8px;">${w.details}</p>
         <a class="photo-link" href="#" data-name="${attr(w.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
+        <button class="hide-btn" type="button" data-hide="${attr(w.name)}">${hidden ? 'unhide' : 'hide'}</button>
       </div>
     </div>`;
 }
@@ -1409,6 +1515,25 @@ document.addEventListener('click', (e) => {
     return;
   }
 
+  // Hide / unhide a card
+  const hideBtn = e.target.closest('.hide-btn');
+  if (hideBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const name = hideBtn.dataset.hide;
+    const card = hideBtn.closest('.card');
+    if (!card || !name) return;
+    const willHide = !card.classList.contains('is-hidden');
+    setHidden(name, willHide);
+    card.classList.toggle('is-hidden', willHide);
+    hideBtn.textContent = willHide ? 'unhide' : 'hide';
+    renderRanks('color-grid');
+    renderRanks('wheel-grid');
+    updateColorCount();
+    updateHiddenCount();
+    return;
+  }
+
   // Badge click toggles tooltip; clicking elsewhere closes any open tooltip
   const badge = e.target.closest('.badge');
   if (badge) {
@@ -1436,6 +1561,38 @@ document.getElementById('verified-only').addEventListener('change', (e) => {
   updateColorCount();
 });
 
+document.getElementById('show-hidden').addEventListener('change', (e) => {
+  document.body.classList.toggle('show-hidden', e.target.checked);
+  renderRanks('color-grid');
+  renderRanks('wheel-grid');
+  updateColorCount();
+});
+
+// ── Upload your own image (gallery modal) ──────────────────────
+document.getElementById('upload-btn').addEventListener('click', () => {
+  document.getElementById('upload-input').click();
+});
+document.getElementById('upload-input').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = ''; // allow selecting the same file again later
+  if (!file) return;
+  const name = document.getElementById('modal-name').textContent;
+  if (!name) return;
+  try {
+    const dataUrl = await resizeImageToDataURL(file, 800, 0.85);
+    setPinned(name, dataUrl);
+    refreshCardVisual(name);
+    // Visually mark all matching gallery tiles as not-pinned (custom upload won't appear in Bing results)
+    document.querySelectorAll('.img-tile.is-pinned').forEach(t => {
+      t.classList.remove('is-pinned');
+      const btn = t.querySelector('.pin-btn');
+      if (btn) btn.textContent = 'Pin as primary';
+    });
+  } catch (err) {
+    alert('Could not load that file as an image.');
+  }
+});
+
 function init() {
   const savedColors = JSON.parse(localStorage.getItem(STORE_KEY_COLORS) || 'null');
   const savedWheels = JSON.parse(localStorage.getItem(STORE_KEY_WHEELS) || 'null');
@@ -1449,6 +1606,7 @@ function init() {
   renderRanks('color-grid');
   renderRanks('wheel-grid');
   updateColorCount();
+  updateHiddenCount();
 
   Sortable.create(document.getElementById('color-grid'), {
     animation: 180,
