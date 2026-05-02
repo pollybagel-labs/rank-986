@@ -48,14 +48,27 @@
     font-family: 'Porscha', 'EB Garamond', serif;
     font-weight: normal;
     color: var(--ink);
-    border-top: 2px solid var(--ink);
-    border-bottom: 2px solid var(--ink);
+    background: var(--bg);
+    border-top: 6px solid var(--ink);
+    border-bottom: 6px solid var(--ink);
     margin: 0 -32px 14px;            /* break out of header's 32px horizontal padding */
-    padding: 10px 32px 6px;          /* match the page-edge gutter back on the text */
     font-size: 64px;
     line-height: 1;
     letter-spacing: 0.05em;
-    text-align: left;
+    display: flex;
+    align-items: stretch;
+  }
+  h1.stripe-title .rect-before,
+  h1.stripe-title .rect-after {
+    background: var(--ink);
+    flex-shrink: 0;
+  }
+  h1.stripe-title .rect-before { width: 32px; }
+  h1.stripe-title .rect-after  { flex: 1; }
+  h1.stripe-title .name {
+    padding: 10px 14px 6px;          /* breathing room between text and white blocks */
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   h1.stripe-title .digit { letter-spacing: 0.02em; margin-right: 0.18em; }
   p.title-subtitle {
@@ -685,7 +698,7 @@
 <body>
 
 <header>
-  <h1 class="stripe-title"><span class="digit">986</span>BOXSTER</h1>
+  <h1 class="stripe-title"><span class="rect-before"></span><span class="name"><span class="digit">986</span>BOXSTER</span><span class="rect-after"></span></h1>
   <p class="title-subtitle">color & wheel ranking</p>
   <p class="subtitle">Drag to reorder. Auto-saves to your browser.</p>
   <nav>
