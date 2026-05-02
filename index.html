@@ -11,7 +11,8 @@
 <style>
   @font-face {
     font-family: 'Porscha';
-    src: url('fonts/911porschav3title.ttf') format('truetype');
+    src: url('fonts/911porschav3title.woff2') format('woff2'),
+         url('fonts/911porschav3title.ttf') format('truetype');
     font-display: swap;
     font-weight: normal;
     font-style: normal;
@@ -52,21 +53,23 @@
     border-top: 6px solid var(--ink);
     border-bottom: 6px solid var(--ink);
     margin: 0 -32px 14px;            /* break out of header's 32px horizontal padding */
+    padding: 12px 0;                 /* vertical gap between rules and the blocks/text */
     font-size: 64px;
     line-height: 1;
     letter-spacing: 0.05em;
     display: flex;
-    align-items: stretch;
+    align-items: center;             /* center text + cap-height blocks on a shared axis */
   }
   h1.stripe-title .rect-before,
   h1.stripe-title .rect-after {
     background: var(--ink);
     flex-shrink: 0;
+    height: 0.72em;                  /* match the wordmark's cap height */
   }
   h1.stripe-title .rect-before { width: 32px; }
   h1.stripe-title .rect-after  { flex: 1; }
   h1.stripe-title .name {
-    padding: 10px 14px 6px;          /* breathing room between text and white blocks */
+    padding: 0 14px;                 /* horizontal breathing room between text and blocks */
     white-space: nowrap;
     flex-shrink: 0;
   }
