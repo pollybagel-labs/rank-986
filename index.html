@@ -173,7 +173,27 @@
     font-size: 12px;
     font-weight: 700;
     z-index: 2;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
   }
+  .rank:hover { border-color: var(--accent); color: var(--accent); }
+  .rank.editing { border-color: var(--accent); background: var(--surface); }
+  .rank-input {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 0;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  .rank-input::-webkit-inner-spin-button,
+  .rank-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   .swatch {
     width: 100%;
     height: 140px;
@@ -1257,8 +1277,83 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ── Rank-pip editing (click to retype rank position) ──────────
+function startRankEdit(card) {
+  const rankEl = card.querySelector('.rank');
+  if (!rankEl || rankEl.querySelector('input')) return;
+
+  const grid = card.parentElement;
+  const otherVisible = [...grid.children].filter(c => c !== card && c.offsetParent !== null);
+  const total = otherVisible.length + 1;
+  const currentRank = parseInt(rankEl.textContent, 10) || 1;
+
+  rankEl.classList.add('editing');
+  rankEl.textContent = '';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = 1;
+  input.max = total;
+  input.value = currentRank;
+  input.className = 'rank-input';
+  rankEl.appendChild(input);
+  input.focus();
+  input.select();
+
+  let done = false;
+  const finish = (commit) => {
+    if (done) return;
+    done = true;
+    rankEl.classList.remove('editing');
+    if (commit) {
+      const typed = parseInt(input.value, 10);
+      if (!isNaN(typed) && typed !== currentRank) {
+        moveCardToVisibleRank(card, Math.max(1, Math.min(total, typed)));
+        const storeKey = card.dataset.type === 'color' ? STORE_KEY_COLORS : STORE_KEY_WHEELS;
+        renderRanks(grid.id);
+        saveOrder(grid.id, storeKey);
+        return;
+      }
+    }
+    // No-op: restore original number
+    renderRanks(grid.id);
+  };
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+  });
+  input.addEventListener('blur', () => finish(true));
+}
+
+function moveCardToVisibleRank(card, newVisibleRank) {
+  const grid = card.parentElement;
+  const otherVisible = [...grid.children].filter(c => c !== card && c.offsetParent !== null);
+  if (otherVisible.length === 0) return;
+  if (newVisibleRank <= otherVisible.length) {
+    grid.insertBefore(card, otherVisible[newVisibleRank - 1]);
+  } else {
+    const lastOther = otherVisible[otherVisible.length - 1];
+    grid.insertBefore(card, lastOther.nextSibling);
+  }
+}
+
 // Delegated click handler for gallery links (survives re-renders).
 document.addEventListener('click', (e) => {
+  // Click on rank pip → start editing (don't trigger card drag or anything else)
+  const rank = e.target.closest('.rank');
+  if (rank && !rank.querySelector('input')) {
+    e.preventDefault();
+    e.stopPropagation();
+    const card = rank.closest('.card');
+    if (card) startRankEdit(card);
+    return;
+  }
+  // Don't let clicks inside the active rank input bubble out
+  if (e.target.closest('.rank-input')) {
+    e.stopPropagation();
+    return;
+  }
+
   const link = e.target.closest('.photo-link');
   if (link) {
     e.preventDefault();
@@ -1358,11 +1453,15 @@ function init() {
   Sortable.create(document.getElementById('color-grid'), {
     animation: 180,
     ghostClass: 'dragging',
+    filter: '.rank, .rank-input',
+    preventOnFilter: false,
     onEnd: () => { renderRanks('color-grid'); saveOrder('color-grid', STORE_KEY_COLORS); }
   });
   Sortable.create(document.getElementById('wheel-grid'), {
     animation: 180,
     ghostClass: 'dragging',
+    filter: '.rank, .rank-input',
+    preventOnFilter: false,
     onEnd: () => { renderRanks('wheel-grid'); saveOrder('wheel-grid', STORE_KEY_WHEELS); }
   });
 }
