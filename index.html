@@ -269,20 +269,86 @@
   }
   a.photo-link:hover { border-color: var(--accent); }
   .export-out {
+    position: relative;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 6px;
-    padding: 16px;
+    padding: 20px 20px 20px 20px;
     margin-top: 16px;
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
-    font-size: 12px;
-    color: var(--ink-soft);
-    white-space: pre-wrap;
-    max-height: 400px;
+    max-height: 80vh;
     overflow-y: auto;
     display: none;
   }
   .export-out.visible { display: block; }
+  .export-out pre {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: pre-wrap;
+    margin: 0 0 16px 0;
+    padding-right: 40px; /* don't run under the close button */
+  }
+  .export-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1;
+    transition: all 0.15s;
+    padding: 0;
+  }
+  .export-close:hover { border-color: var(--accent); color: var(--accent); }
+  .export-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .export-actions button {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .export-actions button:hover { border-color: var(--accent); color: var(--accent); }
+  .export-actions button:disabled { opacity: 0.4; cursor: wait; }
+  .share-preview {
+    display: none;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .share-preview.ready { display: block; }
+  .share-preview img {
+    display: block;
+    width: 100%;
+    max-width: 540px;
+    height: auto;
+    margin: 0 auto 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--bg);
+  }
+  .share-preview-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
   footer {
     padding: 32px;
     border-top: 1px solid var(--line);
@@ -808,7 +874,21 @@
     <button class="action" onclick="exportRanking()">Export ranking</button>
     <button class="action" onclick="resetRanking()">Reset</button>
   </nav>
-  <div id="export-out" class="export-out"></div>
+  <div id="export-out" class="export-out">
+    <button type="button" class="export-close" id="export-close" aria-label="Close">×</button>
+    <pre id="export-text"></pre>
+    <div class="export-actions">
+      <button type="button" id="copy-text-btn">Copy text</button>
+      <button type="button" id="generate-share-btn">Generate share image</button>
+    </div>
+    <div class="share-preview" id="share-preview">
+      <img id="share-preview-img" alt="Share image preview">
+      <div class="share-preview-actions">
+        <button type="button" id="download-share-btn">Download PNG</button>
+        <button type="button" id="regenerate-share-btn">Regenerate</button>
+      </div>
+    </div>
+  </div>
 </header>
 
 <main>
@@ -1663,10 +1743,14 @@ function init() {
 }
 
 function exportRanking() {
-  const colorOrder = [...document.getElementById('color-grid').children].map(c => c.dataset.id);
-  const wheelOrder = [...document.getElementById('wheel-grid').children].map(c => c.dataset.id);
+  const colorOrder = [...document.getElementById('color-grid').children]
+    .filter(c => c.offsetParent !== null)
+    .map(c => c.dataset.id);
+  const wheelOrder = [...document.getElementById('wheel-grid').children]
+    .filter(c => c.offsetParent !== null)
+    .map(c => c.dataset.id);
   const pinned = getPinned();
-  const pinnedLines = Object.entries(pinned).map(([n, url]) => `  ${n}: ${url}`);
+  const pinnedLines = Object.entries(pinned).map(([n, url]) => `  ${n}: ${url.length > 80 ? '[uploaded image]' : url}`);
 
   const text = `986 Boxster — Christy's Ranking
 Generated: ${new Date().toLocaleString()}
@@ -1686,10 +1770,241 @@ PINNED PHOTOS
 ═══════════════════════════════════════
 ${pinnedLines.join('\n')}
 ` : ''}`;
-  const out = document.getElementById('export-out');
-  out.textContent = text;
-  out.classList.add('visible');
+  document.getElementById('export-text').textContent = text;
+  document.getElementById('share-preview').classList.remove('ready');
+  document.getElementById('export-out').classList.add('visible');
   navigator.clipboard?.writeText(text);
+}
+
+function closeExport() {
+  document.getElementById('export-out').classList.remove('visible');
+}
+
+document.getElementById('export-close').addEventListener('click', closeExport);
+document.getElementById('copy-text-btn').addEventListener('click', () => {
+  navigator.clipboard?.writeText(document.getElementById('export-text').textContent);
+  const btn = document.getElementById('copy-text-btn');
+  const old = btn.textContent;
+  btn.textContent = '✓ Copied';
+  setTimeout(() => { btn.textContent = old; }, 1500);
+});
+document.getElementById('generate-share-btn').addEventListener('click', generateShareImage);
+document.getElementById('regenerate-share-btn').addEventListener('click', generateShareImage);
+document.getElementById('download-share-btn').addEventListener('click', downloadShareImage);
+
+// ── Share image generation (canvas) ───────────────────────────────
+let shareImageDataUrl = null;
+
+async function generateShareImage() {
+  const btn = document.getElementById('generate-share-btn');
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Rendering…';
+
+  try {
+    // Wait for fonts to be ready so canvas can use them
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+    const visibleColors = [...document.getElementById('color-grid').children]
+      .filter(c => c.offsetParent !== null)
+      .map(c => colors.find(x => x.name === c.dataset.id))
+      .filter(Boolean);
+
+    const canvas = drawShareCard(visibleColors);
+    shareImageDataUrl = canvas.toDataURL('image/png');
+    document.getElementById('share-preview-img').src = shareImageDataUrl;
+    document.getElementById('share-preview').classList.add('ready');
+  } catch (err) {
+    alert('Could not render the share image: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldText;
+  }
+}
+
+function drawShareCard(colorsList) {
+  const W = 1080, H = 1080;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#0e0e10';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Title stripe (mirrors site treatment) ──
+  const stripeWidth = 5;
+  const stripeY = 80;
+  const wordmarkSize = 56;
+  const stripeBlockH = Math.round(wordmarkSize * 0.72) - 14;
+  const innerY = stripeY + stripeWidth + 6;
+  const innerH = wordmarkSize;
+
+  // Top + bottom rules
+  ctx.fillStyle = '#f4f3ee';
+  ctx.fillRect(0, stripeY, W, stripeWidth);
+  ctx.fillRect(0, innerY + innerH + 6, W, stripeWidth);
+
+  // Left + right white blocks (cap-height, centered in band)
+  const blockY = innerY + (innerH - stripeBlockH) / 2;
+  ctx.fillRect(0, blockY, 60, stripeBlockH);
+
+  // Wordmark
+  ctx.fillStyle = '#f4f3ee';
+  ctx.font = `${wordmarkSize}px "Porscha", "EB Garamond", serif`;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  const wmText = '986 BOXSTER';
+  const wmX = 80;
+  const wmY = innerY + innerH / 2 + 4;
+  ctx.fillText(wmText, wmX, wmY);
+  // Right block fills remaining
+  const wmW = ctx.measureText(wmText).width;
+  const rightBlockX = wmX + wmW + 14;
+  ctx.fillRect(rightBlockX, blockY, W - rightBlockX, stripeBlockH);
+
+  // Subtitle
+  ctx.fillStyle = '#ff5d3a';
+  ctx.font = 'italic 500 28px "EB Garamond", serif';
+  ctx.fillText('color ranking', 60, innerY + innerH + stripeWidth + 36);
+
+  // ── Cards grid ──
+  const cardsToShow = Math.min(12, colorsList.length);
+  const cards = colorsList.slice(0, cardsToShow);
+  const cols = 3;
+  const rows = Math.ceil(cardsToShow / cols);
+  const gridTop = 230;
+  const gridBottom = H - 70;
+  const gridLeft = 60;
+  const gridRight = W - 60;
+  const gridW = gridRight - gridLeft;
+  const gridH = gridBottom - gridTop;
+  const gap = 18;
+  const cellW = (gridW - gap * (cols - 1)) / cols;
+  const cellH = (gridH - gap * (rows - 1)) / rows;
+
+  cards.forEach((c, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = gridLeft + col * (cellW + gap);
+    const y = gridTop + row * (cellH + gap);
+    drawCardTile(ctx, c, i + 1, x, y, cellW, cellH);
+  });
+
+  // Footer
+  ctx.fillStyle = '#a8a6a0';
+  ctx.font = '14px "Satoshi", -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('rank-986.vercel.app', W / 2, H - 36);
+  if (cardsToShow < colorsList.length) {
+    ctx.fillStyle = '#6c6a64';
+    ctx.font = '12px "Satoshi", -apple-system, sans-serif';
+    ctx.fillText(`showing top ${cardsToShow} of ${colorsList.length}`, W / 2, H - 56);
+  }
+
+  return canvas;
+}
+
+function drawCardTile(ctx, color, rank, x, y, w, h) {
+  // Card border / background
+  ctx.fillStyle = '#16161a';
+  ctx.strokeStyle = '#2a2a30';
+  ctx.lineWidth = 1;
+  roundRect(ctx, x, y, w, h, 8);
+  ctx.fill();
+  ctx.stroke();
+
+  // Swatch (top portion)
+  const swatchH = h * 0.62;
+  ctx.save();
+  // Clip to rounded top
+  roundRectPath(ctx, x, y, w, swatchH, 8, 8, 0, 0);
+  ctx.clip();
+  ctx.fillStyle = color.hex;
+  ctx.fillRect(x, y, w, swatchH);
+
+  // Subtle metallic/pearl shimmer
+  if (color.type === 'metallic' || color.type === 'pearl') {
+    const grad = ctx.createLinearGradient(x, y, x + w, y + swatchH);
+    grad.addColorStop(0, 'rgba(255,255,255,0)');
+    grad.addColorStop(0.5, color.type === 'pearl' ? 'rgba(255,235,200,0.18)' : 'rgba(255,255,255,0.14)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, w, swatchH);
+  }
+  ctx.restore();
+
+  // Rank pip (top-left)
+  const pipR = 18;
+  const pipX = x + 16 + pipR;
+  const pipY = y + 16 + pipR;
+  ctx.fillStyle = 'rgba(14,14,16,0.85)';
+  ctx.beginPath();
+  ctx.arc(pipX, pipY, pipR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#2a2a30';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#f4f3ee';
+  ctx.font = 'bold 16px "Satoshi", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(rank, pipX, pipY + 1);
+
+  // Name + meta below swatch
+  const textTop = y + swatchH + 12;
+  ctx.fillStyle = '#f4f3ee';
+  ctx.font = '500 18px "EB Garamond", serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  const displayName = color.name.split(' / ')[0];
+  ctx.fillText(truncate(ctx, displayName, w - 32), x + 16, textTop);
+
+  ctx.fillStyle = '#a8a6a0';
+  ctx.font = '11px "Satoshi", sans-serif';
+  ctx.fillText(`${color.code} · ${color.years}`, x + 16, textTop + 26);
+
+  // Reset baseline
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'start';
+}
+
+function truncate(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let out = text;
+  while (out.length > 1 && ctx.measureText(out + '…').width > maxWidth) {
+    out = out.slice(0, -1);
+  }
+  return out + '…';
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  roundRectPath(ctx, x, y, w, h, r, r, r, r);
+}
+function roundRectPath(ctx, x, y, w, h, tl, tr, br, bl) {
+  ctx.beginPath();
+  ctx.moveTo(x + tl, y);
+  ctx.lineTo(x + w - tr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + tr);
+  ctx.lineTo(x + w, y + h - br);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+  ctx.lineTo(x + bl, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - bl);
+  ctx.lineTo(x, y + tl);
+  ctx.quadraticCurveTo(x, y, x + tl, y);
+  ctx.closePath();
+}
+
+function downloadShareImage() {
+  if (!shareImageDataUrl) return;
+  const a = document.createElement('a');
+  a.href = shareImageDataUrl;
+  a.download = `rank-986-${new Date().toISOString().slice(0,10)}.png`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
 
 function resetRanking() {
