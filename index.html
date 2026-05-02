@@ -746,17 +746,20 @@
     background: transparent;
     border: none;
     color: var(--ink-soft);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     cursor: pointer;
     padding: 0;
-    margin-left: 12px;
+    margin-left: 10px;
     font-family: inherit;
     opacity: 0.55;
     transition: opacity 0.15s, color 0.15s;
+    display: inline-flex;
+    vertical-align: middle;
+    line-height: 1;
   }
   .hide-btn:hover { opacity: 1; color: var(--accent); }
+  .hide-btn svg { display: block; }
+  .photo-link { vertical-align: middle; }
+  .swatch.pinned, .wheel-img.pinned { cursor: zoom-in; }
 
   .renamed-flag {
     display: inline-block;
@@ -1027,6 +1030,10 @@ function attr(s) {
   return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
 
+// Eye icons for show/hide toggle
+const EYE_OPEN_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.5"/></svg>';
+const EYE_CLOSED_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 6.1c.46-.06.93-.1 1.4-.1 6.5 0 10 7 10 7s-1 2-2.96 3.95"/><path d="M6.1 6.1C3.66 8.06 2 12 2 12s3.5 7 10 7c1.94 0 3.62-.45 5.05-1.13"/></svg>';
+
 // Build a search query that puts the primary color name in quotes for tighter matching.
 // Uses the first variant if the name has " / " alternates.
 function buildColorQuery(name) {
@@ -1106,7 +1113,7 @@ function colorCard(c) {
         ${c.special ? '<span class="tag special">Special</span>' : ''}
         <br>
         <a class="photo-link" href="#" data-name="${attr(c.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
-        <button class="hide-btn" type="button" data-hide="${attr(c.name)}">${hidden ? 'unhide' : 'hide'}</button>
+        <button class="hide-btn" type="button" data-hide="${attr(c.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this color' : 'Hide this color'}">${hidden ? EYE_CLOSED_SVG : EYE_OPEN_SVG}</button>
       </div>
     </div>`;
 }
@@ -1124,7 +1131,7 @@ function wheelCard(w) {
         <p class="meta">${meta}</p>
         <p style="font-size: 12px; color: var(--ink-soft); margin: 0 0 8px;">${w.details}</p>
         <a class="photo-link" href="#" data-name="${attr(w.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
-        <button class="hide-btn" type="button" data-hide="${attr(w.name)}">${hidden ? 'unhide' : 'hide'}</button>
+        <button class="hide-btn" type="button" data-hide="${attr(w.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this wheel' : 'Hide this wheel'}">${hidden ? EYE_CLOSED_SVG : EYE_OPEN_SVG}</button>
       </div>
     </div>`;
 }
@@ -1322,20 +1329,21 @@ document.getElementById('modal').addEventListener('click', (e) => {
 });
 
 // ── Lightbox ───────────────────────────────────────────────────
-const lightboxState = { fullUrl: null, sourceUrl: null };
+const lightboxState = { fullUrl: null, sourceUrl: null, contextName: null };
 
-function openLightbox(fullUrl, sourceUrl) {
+function openLightbox(fullUrl, sourceUrl, contextName) {
   lightboxState.fullUrl = fullUrl;
   lightboxState.sourceUrl = sourceUrl;
+  lightboxState.contextName = contextName || document.getElementById('modal-name').textContent || null;
   const lb = document.getElementById('lightbox');
   document.getElementById('lightbox-img').src = fullUrl;
   document.getElementById('lightbox-source').href = sourceUrl || fullUrl;
   // Update pin button state to reflect current pin
-  const colorName = document.getElementById('modal-name').textContent;
+  const name = lightboxState.contextName;
   const pinBtn = document.getElementById('lightbox-pin');
-  const isPinned = pinnedFor(colorName) === fullUrl;
-  pinBtn.classList.toggle('is-pinned', isPinned);
-  pinBtn.textContent = isPinned ? '✓ Pinned' : 'Pin as primary';
+  const isPinned = name && pinnedFor(name) === fullUrl;
+  pinBtn.classList.toggle('is-pinned', !!isPinned);
+  pinBtn.textContent = isPinned ? '✓ Pinned (click to unpin)' : 'Pin as primary';
   lb.classList.add('open');
 }
 
@@ -1354,13 +1362,13 @@ document.getElementById('lightbox').addEventListener('click', (e) => {
 document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
 document.getElementById('lightbox-pin').addEventListener('click', (e) => {
   e.stopPropagation();
-  const colorName = document.getElementById('modal-name').textContent;
+  const name = lightboxState.contextName || document.getElementById('modal-name').textContent;
   const url = lightboxState.fullUrl;
-  if (!url || !colorName) return;
-  const isPinned = pinnedFor(colorName) === url;
-  setPinned(colorName, isPinned ? null : url);
-  // Refresh underlying card AND gallery tile states
-  refreshCardVisual(colorName);
+  if (!url || !name) return;
+  const isPinned = pinnedFor(name) === url;
+  setPinned(name, isPinned ? null : url);
+  refreshCardVisual(name);
+  // Refresh gallery tile states (if gallery is open)
   document.querySelectorAll('.img-tile').forEach(t => {
     const tileIsPinned = !isPinned && t.dataset.full === url;
     t.classList.toggle('is-pinned', tileIsPinned);
@@ -1370,7 +1378,7 @@ document.getElementById('lightbox-pin').addEventListener('click', (e) => {
   // Refresh lightbox button itself
   const pinBtn = document.getElementById('lightbox-pin');
   pinBtn.classList.toggle('is-pinned', !isPinned);
-  pinBtn.textContent = isPinned ? 'Pin as primary' : '✓ Pinned';
+  pinBtn.textContent = isPinned ? 'Pin as primary' : '✓ Pinned (click to unpin)';
 });
 
 document.addEventListener('keydown', (e) => {
@@ -1526,11 +1534,27 @@ document.addEventListener('click', (e) => {
     const willHide = !card.classList.contains('is-hidden');
     setHidden(name, willHide);
     card.classList.toggle('is-hidden', willHide);
-    hideBtn.textContent = willHide ? 'unhide' : 'hide';
+    hideBtn.innerHTML = willHide ? EYE_CLOSED_SVG : EYE_OPEN_SVG;
+    hideBtn.setAttribute('aria-label', willHide ? 'Unhide' : 'Hide');
+    hideBtn.setAttribute('title', willHide ? 'Unhide' : 'Hide');
     renderRanks('color-grid');
     renderRanks('wheel-grid');
     updateColorCount();
     updateHiddenCount();
+    return;
+  }
+
+  // Click on a pinned swatch / wheel-img → open the photo in the lightbox
+  const pinnedArt = e.target.closest('.swatch.pinned, .wheel-img.pinned');
+  if (pinnedArt && !e.target.closest('.unpin')) {
+    e.preventDefault();
+    e.stopPropagation();
+    const card = pinnedArt.closest('.card');
+    const name = card?.dataset.id;
+    if (name) {
+      const url = pinnedFor(name);
+      if (url) openLightbox(url, url, name);
+    }
     return;
   }
 
@@ -1611,14 +1635,14 @@ function init() {
   Sortable.create(document.getElementById('color-grid'), {
     animation: 180,
     ghostClass: 'dragging',
-    filter: '.rank, .rank-input',
+    filter: '.rank, .rank-input, .swatch.pinned, .wheel-img.pinned, .unpin, .hide-btn, .photo-link',
     preventOnFilter: false,
     onEnd: () => { renderRanks('color-grid'); saveOrder('color-grid', STORE_KEY_COLORS); }
   });
   Sortable.create(document.getElementById('wheel-grid'), {
     animation: 180,
     ghostClass: 'dragging',
-    filter: '.rank, .rank-input',
+    filter: '.rank, .rank-input, .swatch.pinned, .wheel-img.pinned, .unpin, .hide-btn, .photo-link',
     preventOnFilter: false,
     onEnd: () => { renderRanks('wheel-grid'); saveOrder('wheel-grid', STORE_KEY_WHEELS); }
   });
