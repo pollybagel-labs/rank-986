@@ -1113,7 +1113,7 @@ function colorCard(c) {
         ${c.special ? '<span class="tag special">Special</span>' : ''}
         <br>
         <a class="photo-link" href="#" data-name="${attr(c.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
-        <button class="hide-btn" type="button" data-hide="${attr(c.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this color' : 'Hide this color'}">${hidden ? EYE_CLOSED_SVG : EYE_OPEN_SVG}</button>
+        <button class="hide-btn" type="button" data-hide="${attr(c.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this color' : 'Hide this color'}">${hidden ? EYE_OPEN_SVG : EYE_CLOSED_SVG}</button>
       </div>
     </div>`;
 }
@@ -1131,7 +1131,7 @@ function wheelCard(w) {
         <p class="meta">${meta}</p>
         <p style="font-size: 12px; color: var(--ink-soft); margin: 0 0 8px;">${w.details}</p>
         <a class="photo-link" href="#" data-name="${attr(w.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
-        <button class="hide-btn" type="button" data-hide="${attr(w.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this wheel' : 'Hide this wheel'}">${hidden ? EYE_CLOSED_SVG : EYE_OPEN_SVG}</button>
+        <button class="hide-btn" type="button" data-hide="${attr(w.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this wheel' : 'Hide this wheel'}">${hidden ? EYE_OPEN_SVG : EYE_CLOSED_SVG}</button>
       </div>
     </div>`;
 }
@@ -1534,7 +1534,7 @@ document.addEventListener('click', (e) => {
     const willHide = !card.classList.contains('is-hidden');
     setHidden(name, willHide);
     card.classList.toggle('is-hidden', willHide);
-    hideBtn.innerHTML = willHide ? EYE_CLOSED_SVG : EYE_OPEN_SVG;
+    hideBtn.innerHTML = willHide ? EYE_OPEN_SVG : EYE_CLOSED_SVG;
     hideBtn.setAttribute('aria-label', willHide ? 'Unhide' : 'Hide');
     hideBtn.setAttribute('title', willHide ? 'Unhide' : 'Hide');
     renderRanks('color-grid');
