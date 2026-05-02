@@ -748,17 +748,24 @@
     color: var(--ink-soft);
     cursor: pointer;
     padding: 0;
-    margin-left: 10px;
+    margin: 0;
     font-family: inherit;
     opacity: 0.55;
     transition: opacity 0.15s, color 0.15s;
     display: inline-flex;
-    vertical-align: middle;
     line-height: 1;
+    flex-shrink: 0;
   }
   .hide-btn:hover { opacity: 1; color: var(--accent); }
   .hide-btn svg { display: block; }
-  .photo-link { vertical-align: middle; }
+  .name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 0 4px;
+  }
+  .name-row .name { margin: 0; flex: 1; min-width: 0; }
   .swatch.pinned, .wheel-img.pinned { cursor: zoom-in; }
 
   .renamed-flag {
@@ -1107,13 +1114,15 @@ function colorCard(c) {
       <div class="tooltip">${tooltipHtml}</div>
       ${swatchHtml(c)}
       <div class="body">
-        <p class="name">${c.name}</p>
+        <div class="name-row">
+          <p class="name">${c.name}</p>
+          <button class="hide-btn" type="button" data-hide="${attr(c.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this color' : 'Hide this color'}">${hidden ? EYE_OPEN_SVG : EYE_CLOSED_SVG}</button>
+        </div>
         <p class="meta">${meta}</p>
         <span class="tag ${c.type}">${c.type}</span>
         ${c.special ? '<span class="tag special">Special</span>' : ''}
         <br>
         <a class="photo-link" href="#" data-name="${attr(c.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
-        <button class="hide-btn" type="button" data-hide="${attr(c.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this color' : 'Hide this color'}">${hidden ? EYE_OPEN_SVG : EYE_CLOSED_SVG}</button>
       </div>
     </div>`;
 }
@@ -1127,11 +1136,13 @@ function wheelCard(w) {
       <span class="rank" title="Click to type a new rank"></span>
       ${wheelImgHtml(w)}
       <div class="body">
-        <p class="name">${w.name}</p>
+        <div class="name-row">
+          <p class="name">${w.name}</p>
+          <button class="hide-btn" type="button" data-hide="${attr(w.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this wheel' : 'Hide this wheel'}">${hidden ? EYE_OPEN_SVG : EYE_CLOSED_SVG}</button>
+        </div>
         <p class="meta">${meta}</p>
         <p style="font-size: 12px; color: var(--ink-soft); margin: 0 0 8px;">${w.details}</p>
         <a class="photo-link" href="#" data-name="${attr(w.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
-        <button class="hide-btn" type="button" data-hide="${attr(w.name)}" aria-label="${hidden ? 'Unhide' : 'Hide'}" title="${hidden ? 'Unhide this wheel' : 'Hide this wheel'}">${hidden ? EYE_OPEN_SVG : EYE_CLOSED_SVG}</button>
       </div>
     </div>`;
 }
