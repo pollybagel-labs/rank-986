@@ -38,7 +38,7 @@
     line-height: 1.5;
   }
   header {
-    padding: 48px 32px 24px;
+    padding: 48px 32px 24px 64px;
     border-bottom: 1px solid var(--line);
     position: sticky;
     top: 0;
@@ -53,7 +53,7 @@
     background: var(--bg);
     border-top: 6px solid var(--ink);
     border-bottom: 6px solid var(--ink);
-    margin: 0 -32px 14px;            /* break out of header's 32px horizontal padding */
+    margin: 0 -32px 14px -64px;      /* still bleed to viewport edges with new asymmetric header padding */
     padding: 6px 0;                  /* vertical gap (= stripe width) on each side of content */
     font-size: 74px;
     line-height: 0.55;               /* tightens the wordmark line-box so the cap sits near the rule */
