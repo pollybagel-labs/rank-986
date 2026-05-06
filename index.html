@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>986 Boxster — Color & Wheel Ranking</title>
+<title>986 Boxster — Color Ranking</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -342,24 +342,73 @@
   .export-actions button:hover { border-color: var(--accent); color: var(--accent); }
   .export-actions button:disabled { opacity: 0.4; cursor: wait; }
   .share-preview {
-    display: none;
+    display: block;
     padding-top: 8px;
   }
-  .share-preview.ready { display: block; }
+  .share-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .share-cta {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--accent);
+    margin: 0;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .share-status {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin: 0;
+    display: none;
+  }
+  .share-preview.loading .share-status { display: block; }
+  .share-preview img,
+  .share-preview .share-preview-actions {
+    display: none;
+  }
+  .share-preview.ready img { display: block; }
+  .share-preview.ready .share-preview-actions { display: flex; }
   .share-preview img {
-    display: block;
     width: 100%;
     height: auto;
-    margin: 0 0 12px;
+    margin: 0;
     border: 1px solid var(--line);
     border-radius: 4px;
     background: var(--bg);
   }
   .share-preview-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 4px;
+    margin-left: auto;
   }
+  .share-preview-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+  }
+  .share-preview-actions button:hover,
+  .share-preview-actions button:focus-visible {
+    color: var(--ink);
+    border-color: var(--line);
+    background: var(--surface);
+    outline: none;
+  }
+  .share-preview-actions button:active { transform: translateY(1px); }
+  .share-preview-actions button svg { display: block; }
   footer {
     padding: 32px;
     border-top: 1px solid var(--line);
@@ -866,11 +915,10 @@
 
 <header>
   <h1 class="stripe-title"><span class="rect-before"></span><span class="wordmark">986 BOXSTER</span><span class="rect-after"></span></h1>
-  <p class="title-subtitle">color & wheel ranking</p>
-  <p class="subtitle">Drag to reorder. Auto-saves to your browser.</p>
+  <p class="title-subtitle">rank the colors.</p>
+  <p class="subtitle">Drag to reorder. Saves locally. No account, no analytics, nothing leaves your browser (until you share your favorites).</p>
   <nav>
     <a href="#colors" class="active">Colors <span id="color-count" style="opacity:0.6;font-size:11px"></span></a>
-    <a href="#wheels">OEM Wheels</a>
     <label class="filter-toggle" title="Hide colors with fewer than 3 confirming sources">
       <input type="checkbox" id="verified-only">
       <span class="check"></span>
@@ -893,14 +941,18 @@
     <div class="export-col-right">
       <div class="export-actions">
         <button type="button" id="copy-text-btn">Copy text</button>
-        <button type="button" id="generate-share-btn">Generate share image</button>
       </div>
       <div class="share-preview" id="share-preview">
-        <img id="share-preview-img" alt="Share image preview">
-        <div class="share-preview-actions">
-          <button type="button" id="download-share-btn">Download PNG</button>
-          <button type="button" id="regenerate-share-btn">Regenerate</button>
+        <div class="share-preview-header">
+          <p class="share-cta">Share your top 12.</p>
+          <p class="share-status" id="share-status">Rendering…</p>
+          <div class="share-preview-actions">
+            <button type="button" id="download-share-btn" title="Download PNG" aria-label="Download PNG"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg></button>
+            <button type="button" id="share-btn" title="Share — uses your device's share sheet" aria-label="Share"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M5 12v8a2 2 0 002 2h10a2 2 0 002-2v-8"/></svg></button>
+            <button type="button" id="regenerate-share-btn" title="Regenerate" aria-label="Regenerate"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
+          </div>
         </div>
+        <img id="share-preview-img" alt="Share image preview">
       </div>
     </div>
   </div>
@@ -909,16 +961,11 @@
 <main>
 
 <section id="colors">
-  <h2>Exterior colors</h2>
-  <p class="intro">Factory paint options offered on the 986 (1997–2004), triangulated across 5 source types. Each card shows a confirmation badge — click it for sources and conflicts. Hex swatches are approximations; "View gallery" pulls live photos. Full audit trail in <a href="colors-provenance.md" style="color: var(--accent-soft);">colors-provenance.md</a>.</p>
+  <h2>The paint</h2>
+  <p class="intro">Every factory paint offered on the 986 (1997–2004), triangulated across 5 source types because the existing internet got it wrong in at least four different ways. Click the ✓✓✓ badge for sources and the conflicts we had to resolve. Hex values are approximations — for actual lighting, hit "View gallery." Full receipts in <a href="colors-provenance.md" style="color: var(--accent-soft);">colors-provenance.md</a>.</p>
   <div class="grid" id="color-grid"></div>
 </section>
 
-<section id="wheels">
-  <h2>OEM wheel designs</h2>
-  <p class="intro">Factory wheel options offered on the 986. Naming gets fuzzy in the enthusiast community — some designs go by multiple names. Click "see real photos" for visual reference.</p>
-  <div class="grid" id="wheel-grid"></div>
-</section>
 
 </main>
 
@@ -950,7 +997,8 @@
 </div>
 
 <footer>
-  Sources: <a href="https://986porsche.com/porsche-boxster-986-colors/?lang=en">986porsche.com</a> · <a href="https://www.paintscratch.com/touch_up_paint/Porsche/Boxster.html">PaintScratch</a> · <a href="https://www.automotivetouchup.com/touch-up-paint/porsche/">AutomotiveTouchup</a> · <a href="https://www.pca.org/news/unicorn-colors-the-porsche-986-996-edition">PCA Unicorn Colors</a> · <a href="https://www.autopedia.com/Porsc/98_BoxstOpt.html">Autopedia 1998 dealer sheet</a> · Photos via Bing
+  Sources: <a href="https://986porsche.com/porsche-boxster-986-colors/?lang=en">986porsche.com</a> · <a href="https://www.paintscratch.com/touch_up_paint/Porsche/Boxster.html">PaintScratch</a> · <a href="https://www.automotivetouchup.com/touch-up-paint/porsche/">AutomotiveTouchup</a> · <a href="https://www.pca.org/news/unicorn-colors-the-porsche-986-996-edition">PCA Unicorn Colors</a> · <a href="https://www.autopedia.com/Porsc/98_BoxstOpt.html">Autopedia 1998 dealer sheet</a> · Photos via Bing<br>
+  Demo pin photo: <a href="https://commons.wikimedia.org/wiki/File:1997_Porsche_986_Boxster_(7).jpg">1997 986 Boxster, Guards Red</a> by Damian B Oh, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
 </footer>
 
 <script>
@@ -1075,6 +1123,28 @@ const STORE_KEY_COLORS = "porsche986_color_rank";
 const STORE_KEY_WHEELS = "porsche986_wheel_rank";
 const STORE_KEY_PINNED  = "porsche986_pinned_images";
 const STORE_KEY_HIDDEN  = "porsche986_hidden";
+// Bump this version when the demo asset/color changes so existing visitors re-see the new demo.
+const STORE_KEY_DEMO_SEEDED = "porsche986_demo_pin_seeded_v2";
+
+// First-load demo: pre-pin one chip so the photo-pinning feature is visible without explanation.
+// Image: CC BY-SA 4.0, photographer Damian B Oh — https://commons.wikimedia.org/wiki/File:1997_Porsche_986_Boxster_(7).jpg
+// Seeded once per browser; if the visitor unpins it, it does NOT come back. Reset clears the flag too.
+const DEMO_PIN_COLOR = "Guards Red";
+const DEMO_PIN_URL = "/assets/demo-pin-986-guards-red.jpg";
+
+// Old demo pins from prior versions — clean these up on load so we don't leave 404s in localStorage.
+const OLD_DEMO_PINS = [
+  { color: "Wimbledon Green Metallic", url: "/assets/demo-pin-986-green.jpg" }
+];
+
+function seedDemoPin() {
+  for (const old of OLD_DEMO_PINS) {
+    if (pinnedFor(old.color) === old.url) setPinned(old.color, null);
+  }
+  if (localStorage.getItem(STORE_KEY_DEMO_SEEDED)) return;
+  if (!pinnedFor(DEMO_PIN_COLOR)) setPinned(DEMO_PIN_COLOR, DEMO_PIN_URL);
+  localStorage.setItem(STORE_KEY_DEMO_SEEDED, "1");
+}
 
 function getPinned() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY_PINNED) || '{}'); }
@@ -1651,14 +1721,13 @@ document.addEventListener('click', (e) => {
     hideBtn.setAttribute('aria-label', willHide ? 'Unhide' : 'Hide');
     hideBtn.setAttribute('title', willHide ? 'Unhide' : 'Hide');
     renderRanks('color-grid');
-    renderRanks('wheel-grid');
     updateColorCount();
     updateHiddenCount();
     return;
   }
 
-  // Click on a pinned swatch / wheel-img → open the photo in the lightbox
-  const pinnedArt = e.target.closest('.swatch.pinned, .wheel-img.pinned');
+  // Click on a pinned swatch → open the photo in the lightbox
+  const pinnedArt = e.target.closest('.swatch.pinned');
   if (pinnedArt && !e.target.closest('.unpin')) {
     e.preventDefault();
     e.stopPropagation();
@@ -1701,7 +1770,6 @@ document.getElementById('verified-only').addEventListener('change', (e) => {
 document.getElementById('show-hidden').addEventListener('change', (e) => {
   document.body.classList.toggle('show-hidden', e.target.checked);
   renderRanks('color-grid');
-  renderRanks('wheel-grid');
   updateColorCount();
 });
 
@@ -1731,41 +1799,25 @@ document.getElementById('upload-input').addEventListener('change', async (e) => 
 });
 
 function init() {
+  seedDemoPin();
   const savedColors = JSON.parse(localStorage.getItem(STORE_KEY_COLORS) || 'null');
-  const savedWheels = JSON.parse(localStorage.getItem(STORE_KEY_WHEELS) || 'null');
-
   const orderedColors = applyOrder(colors, savedColors);
-  const orderedWheels = applyOrder(wheels, savedWheels);
-
   document.getElementById('color-grid').innerHTML = orderedColors.map(colorCard).join('');
-  document.getElementById('wheel-grid').innerHTML = orderedWheels.map(wheelCard).join('');
-
   renderRanks('color-grid');
-  renderRanks('wheel-grid');
   updateColorCount();
   updateHiddenCount();
 
   Sortable.create(document.getElementById('color-grid'), {
     animation: 180,
     ghostClass: 'dragging',
-    filter: '.rank, .rank-input, .swatch.pinned, .wheel-img.pinned, .unpin, .hide-btn, .photo-link',
+    filter: '.rank, .rank-input, .swatch.pinned, .unpin, .hide-btn, .photo-link',
     preventOnFilter: false,
     onEnd: () => { renderRanks('color-grid'); saveOrder('color-grid', STORE_KEY_COLORS); }
-  });
-  Sortable.create(document.getElementById('wheel-grid'), {
-    animation: 180,
-    ghostClass: 'dragging',
-    filter: '.rank, .rank-input, .swatch.pinned, .wheel-img.pinned, .unpin, .hide-btn, .photo-link',
-    preventOnFilter: false,
-    onEnd: () => { renderRanks('wheel-grid'); saveOrder('wheel-grid', STORE_KEY_WHEELS); }
   });
 }
 
 function exportRanking() {
   const colorOrder = [...document.getElementById('color-grid').children]
-    .filter(c => c.offsetParent !== null)
-    .map(c => c.dataset.id);
-  const wheelOrder = [...document.getElementById('wheel-grid').children]
     .filter(c => c.offsetParent !== null)
     .map(c => c.dataset.id);
   const pinned = getPinned();
@@ -1778,11 +1830,6 @@ Generated: ${new Date().toLocaleString()}
 COLORS (best → worst)
 ═══════════════════════════════════════
 ${colorOrder.map((n, i) => `${(i+1).toString().padStart(2)}. ${n}${pinned[n] ? ' 📌' : ''}`).join('\n')}
-
-═══════════════════════════════════════
-OEM WHEELS (best → worst)
-═══════════════════════════════════════
-${wheelOrder.map((n, i) => `${(i+1).toString().padStart(2)}. ${n}${pinned[n] ? ' 📌' : ''}`).join('\n')}
 ${pinnedLines.length ? `
 ═══════════════════════════════════════
 PINNED PHOTOS
@@ -1790,9 +1837,9 @@ PINNED PHOTOS
 ${pinnedLines.join('\n')}
 ` : ''}`;
   document.getElementById('export-text').textContent = text;
-  document.getElementById('share-preview').classList.remove('ready');
   document.getElementById('export-out').classList.add('visible');
   navigator.clipboard?.writeText(text);
+  generateShareImage();
 }
 
 function closeExport() {
@@ -1807,18 +1854,19 @@ document.getElementById('copy-text-btn').addEventListener('click', () => {
   btn.textContent = '✓ Copied';
   setTimeout(() => { btn.textContent = old; }, 1500);
 });
-document.getElementById('generate-share-btn').addEventListener('click', generateShareImage);
 document.getElementById('regenerate-share-btn').addEventListener('click', generateShareImage);
 document.getElementById('download-share-btn').addEventListener('click', downloadShareImage);
+document.getElementById('share-btn').addEventListener('click', shareImage);
 
 // ── Share image generation (canvas) ───────────────────────────────
 let shareImageDataUrl = null;
 
 async function generateShareImage() {
-  const btn = document.getElementById('generate-share-btn');
-  const oldText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Rendering…';
+  const preview = document.getElementById('share-preview');
+  const status = document.getElementById('share-status');
+  preview.classList.remove('ready');
+  preview.classList.add('loading');
+  status.textContent = 'Rendering…';
 
   try {
     // Wait for fonts to be ready so canvas can use them
@@ -1829,19 +1877,54 @@ async function generateShareImage() {
       .map(c => colors.find(x => x.name === c.dataset.id))
       .filter(Boolean);
 
-    const canvas = drawShareCard(visibleColors);
+    const canvas = await drawShareCard(visibleColors);
     shareImageDataUrl = canvas.toDataURL('image/png');
     document.getElementById('share-preview-img').src = shareImageDataUrl;
-    document.getElementById('share-preview').classList.add('ready');
+    preview.classList.remove('loading');
+    preview.classList.add('ready');
   } catch (err) {
-    alert('Could not render the share image: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = oldText;
+    status.textContent = `Couldn't render: ${err.message}`;
   }
 }
 
-function drawShareCard(colorsList) {
+// Cross-origin URLs (Bing CDN, etc.) load fine for display but taint the canvas,
+// so route them through /api/proxy-image which re-serves with CORS headers.
+// Same-origin URLs (e.g. /assets/...) bypass the proxy.
+function shareImageUrl(url) {
+  try {
+    const u = new URL(url, location.href);
+    if (u.origin === location.origin) return url;
+    return `/api/proxy-image?url=${encodeURIComponent(u.href)}`;
+  } catch {
+    return url;
+  }
+}
+
+// Load an image with CORS so its pixels can be drawn into a canvas that we
+// later toDataURL(). If load fails (network, CORS, deleted source), resolve null
+// and the caller falls back to the hex swatch.
+function loadShareImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = shareImageUrl(url);
+  });
+}
+
+async function preloadPinnedForShare(colorsList) {
+  const map = new Map();
+  await Promise.all(colorsList.map(async (c) => {
+    const url = pinnedFor(c.name);
+    if (!url) return;
+    const img = await loadShareImage(url);
+    if (img) map.set(c.name, img);
+  }));
+  return map;
+}
+
+async function drawShareCard(colorsList) {
   const W = 1080, H = 1080;
   const canvas = document.createElement('canvas');
   canvas.width = W;
@@ -1883,13 +1966,14 @@ function drawShareCard(colorsList) {
   const rightBlockX = wmX + wmW + 14;
   ctx.fillRect(rightBlockX, blockY, W - rightBlockX, stripeBlockH);
 
+  // ── Cards grid ──
+  const cardsToShow = Math.min(12, colorsList.length);
+
   // Subtitle
   ctx.fillStyle = '#ff5d3a';
   ctx.font = 'italic 500 28px "EB Garamond", serif';
-  ctx.fillText('color ranking', 60, innerY + innerH + stripeWidth + 36);
+  ctx.fillText(`my top ${cardsToShow}`, 60, innerY + innerH + stripeWidth + 36);
 
-  // ── Cards grid ──
-  const cardsToShow = Math.min(12, colorsList.length);
   const cards = colorsList.slice(0, cardsToShow);
   const cols = 3;
   const rows = Math.ceil(cardsToShow / cols);
@@ -1903,12 +1987,14 @@ function drawShareCard(colorsList) {
   const cellW = (gridW - gap * (cols - 1)) / cols;
   const cellH = (gridH - gap * (rows - 1)) / rows;
 
+  const pinnedImages = await preloadPinnedForShare(cards);
+
   cards.forEach((c, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
     const x = gridLeft + col * (cellW + gap);
     const y = gridTop + row * (cellH + gap);
-    drawCardTile(ctx, c, i + 1, x, y, cellW, cellH);
+    drawCardTile(ctx, c, i + 1, x, y, cellW, cellH, pinnedImages.get(c.name));
   });
 
   // Footer
@@ -1926,7 +2012,7 @@ function drawShareCard(colorsList) {
   return canvas;
 }
 
-function drawCardTile(ctx, color, rank, x, y, w, h) {
+function drawCardTile(ctx, color, rank, x, y, w, h, pinnedImg) {
   // Card border / background
   ctx.fillStyle = '#16161a';
   ctx.strokeStyle = '#2a2a30';
@@ -1935,23 +2021,43 @@ function drawCardTile(ctx, color, rank, x, y, w, h) {
   ctx.fill();
   ctx.stroke();
 
-  // Swatch (top portion)
-  const swatchH = h * 0.62;
+  // Swatch (top portion) — slightly larger now that the meta line is gone.
+  const swatchH = h * 0.7;
   ctx.save();
   // Clip to rounded top
   roundRectPath(ctx, x, y, w, swatchH, 8, 8, 0, 0);
   ctx.clip();
-  ctx.fillStyle = color.hex;
-  ctx.fillRect(x, y, w, swatchH);
 
-  // Subtle metallic/pearl shimmer
-  if (color.type === 'metallic' || color.type === 'pearl') {
-    const grad = ctx.createLinearGradient(x, y, x + w, y + swatchH);
-    grad.addColorStop(0, 'rgba(255,255,255,0)');
-    grad.addColorStop(0.5, color.type === 'pearl' ? 'rgba(255,235,200,0.18)' : 'rgba(255,255,255,0.14)');
-    grad.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = grad;
+  if (pinnedImg) {
+    // Cover-fit the pinned photo into the swatch area
+    const targetAr = w / swatchH;
+    const imgAr = pinnedImg.width / pinnedImg.height;
+    let sx, sy, sw, sh;
+    if (imgAr > targetAr) {
+      sh = pinnedImg.height;
+      sw = sh * targetAr;
+      sx = (pinnedImg.width - sw) / 2;
+      sy = 0;
+    } else {
+      sw = pinnedImg.width;
+      sh = sw / targetAr;
+      sx = 0;
+      sy = (pinnedImg.height - sh) / 2;
+    }
+    ctx.drawImage(pinnedImg, sx, sy, sw, sh, x, y, w, swatchH);
+  } else {
+    ctx.fillStyle = color.hex;
     ctx.fillRect(x, y, w, swatchH);
+
+    // Subtle metallic/pearl shimmer (only for hex swatch — real photos already shimmer)
+    if (color.type === 'metallic' || color.type === 'pearl') {
+      const grad = ctx.createLinearGradient(x, y, x + w, y + swatchH);
+      grad.addColorStop(0, 'rgba(255,255,255,0)');
+      grad.addColorStop(0.5, color.type === 'pearl' ? 'rgba(255,235,200,0.18)' : 'rgba(255,255,255,0.14)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, w, swatchH);
+    }
   }
   ctx.restore();
 
@@ -1972,7 +2078,7 @@ function drawCardTile(ctx, color, rank, x, y, w, h) {
   ctx.textBaseline = 'middle';
   ctx.fillText(rank, pipX, pipY + 1);
 
-  // Name + meta below swatch
+  // Name below swatch
   const textTop = y + swatchH + 12;
   ctx.fillStyle = '#f4f3ee';
   ctx.font = '500 18px "EB Garamond", serif';
@@ -1980,10 +2086,6 @@ function drawCardTile(ctx, color, rank, x, y, w, h) {
   ctx.textBaseline = 'top';
   const displayName = color.name.split(' / ')[0];
   ctx.fillText(truncate(ctx, displayName, w - 32), x + 16, textTop);
-
-  ctx.fillStyle = '#a8a6a0';
-  ctx.font = '11px "Satoshi", sans-serif';
-  ctx.fillText(`${color.code} · ${color.years}`, x + 16, textTop + 26);
 
   // Reset baseline
   ctx.textBaseline = 'alphabetic';
@@ -2026,6 +2128,41 @@ function downloadShareImage() {
   a.remove();
 }
 
+async function shareImage() {
+  if (!shareImageDataUrl) return;
+  const btn = document.getElementById('share-btn');
+  const oldText = btn.textContent;
+  const filename = `rank-986-${new Date().toISOString().slice(0,10)}.png`;
+  const shareText = 'My top 12 — Porsche 986 Boxster colors. Rank yours: https://rank-986.vercel.app';
+
+  // Best path: native share with the image file (works on iOS/Android and most modern browsers)
+  try {
+    const blob = await (await fetch(shareImageDataUrl)).blob();
+    const file = new File([blob], filename, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'My top 12 — 986 Boxster',
+        text: shareText
+      });
+      return;
+    }
+  } catch (err) {
+    // User cancel raises AbortError — silently swallow, otherwise fall through to clipboard
+    if (err && err.name === 'AbortError') return;
+  }
+
+  // Fallback: copy share text + URL to clipboard. (Image stays in the preview for manual download.)
+  try {
+    await navigator.clipboard.writeText(shareText);
+    btn.textContent = '✓ Link copied — download to share';
+    setTimeout(() => { btn.textContent = oldText; }, 2400);
+  } catch {
+    btn.textContent = 'Copy failed — use Download PNG';
+    setTimeout(() => { btn.textContent = oldText; }, 2400);
+  }
+}
+
 function resetRanking() {
   const hasPinned = Object.keys(getPinned()).length > 0;
   const msg = hasPinned
@@ -2035,6 +2172,7 @@ function resetRanking() {
   localStorage.removeItem(STORE_KEY_COLORS);
   localStorage.removeItem(STORE_KEY_WHEELS);
   if (hasPinned) localStorage.removeItem(STORE_KEY_PINNED);
+  localStorage.removeItem(STORE_KEY_DEMO_SEEDED);
   document.getElementById('export-out').classList.remove('visible');
   init();
 }
