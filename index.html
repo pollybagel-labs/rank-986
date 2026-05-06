@@ -1939,9 +1939,10 @@ async function drawShareCard(colorsList) {
   const stripeWidth = 5;
   const stripeY = 80;
   const wordmarkSize = 56;
-  const stripeBlockH = Math.round(wordmarkSize * 0.72) - 14;
+  const capHeight = Math.round(wordmarkSize * 0.72);  // ~40px — actual glyph height
+  const stripeBlockH = capHeight - 14;
   const innerY = stripeY + stripeWidth + 6;
-  const innerH = wordmarkSize;
+  const innerH = capHeight;  // tightens top/bottom stripes to hug the wordmark
 
   // Top + bottom rules
   ctx.fillStyle = '#f4f3ee';
@@ -1959,7 +1960,7 @@ async function drawShareCard(colorsList) {
   ctx.textAlign = 'left';
   const wmText = '986 BOXSTER';
   const wmX = 80;
-  const wmY = innerY + innerH / 2 + 4;
+  const wmY = innerY + innerH / 2;
   ctx.fillText(wmText, wmX, wmY);
   // Right block fills remaining
   const wmW = ctx.measureText(wmText).width;
