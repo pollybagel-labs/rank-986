@@ -1141,8 +1141,12 @@ const EYE_CLOSED_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="no
 
 // Build a search query that puts the primary color name in quotes for tighter matching.
 // Uses the first variant if the name has " / " alternates.
+// If the name ends with "Metallic", keep that word outside the quotes so the search
+// still matches listings that drop or vary the "Metallic" suffix.
 function buildColorQuery(name) {
   const primary = name.split(' / ')[0].trim();
+  const m = primary.match(/^(.+?)\s+(metallic)$/i);
+  if (m) return `Porsche 986 Boxster "${m[1]}" ${m[2]}`;
   return `Porsche 986 Boxster "${primary}"`;
 }
 
