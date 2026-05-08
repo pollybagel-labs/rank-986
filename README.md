@@ -1,6 +1,6 @@
 # rank-986
 
-A drag-and-rank tier list for the Porsche 986 Boxster (1997–2004) — every factory exterior color, every OEM wheel design, with live image search and source-triangulated provenance.
+A drag-and-rank tier list for the Porsche 986 Boxster (1997–2004) — every factory exterior color, with live image search and source-triangulated provenance.
 
 **Try it: [rank-986.vercel.app](https://rank-986.vercel.app)**
 
@@ -9,7 +9,6 @@ Built for fun. Triangulates color data across five source types (paint vendors, 
 ## What it does
 
 - **35 factory colors** with hex-approximation swatches, year ranges, paint codes, and source-confirmation badges
-- **10 OEM wheel designs** with year + spec context
 - **Drag to reorder** anything — saves to your browser's localStorage
 - **Click "View gallery"** on any card to live-search photos via Bing — infinite scroll, in-page lightbox
 - **Pin a photo** as a card's primary visual to replace the swatch with a real Boxster in that paint
@@ -75,10 +74,11 @@ const wheels = [
 ### What to change
 
 1. **Replace the `colors` array** with your model's palette. Keep the schema identical — the badge math, the verified-only filter, and the search query templating all key off these field names.
-2. **Replace the `wheels` array** with your model's OEM wheels.
-3. **Update the wordmark** — search the file for `986` and `Boxster` and swap. The orange `<span class="wordmark">` uses the [911 Porscha](https://www.dafont.com/911porscha.font) font for the model name.
-4. **Update the page title and intro copy** at the top of `<header>` and the `<section>` intros.
-5. **Update `colors-provenance.md`** with your own sources and triangulation findings (or delete it and start fresh).
+2. **Update the wordmark** — search the file for `986` and `Boxster` and swap. The orange `<span class="wordmark">` uses the [911 Porscha](https://www.dafont.com/911porscha.font) font for the model name.
+3. **Update the page title and intro copy** at the top of `<header>` and the `<section>` intros.
+4. **Update `colors-provenance.md`** with your own sources and triangulation findings (or delete it and start fresh).
+
+> The codebase still includes `wheels[]`, `wheelCard()`, and `buildWheelQuery()` — they're scaffolded but no longer rendered on the live site. Bring them back by adding a `<section id="wheels">` and an `init()` block that mirrors the colors-grid setup.
 
 ### Searching is automatic
 
