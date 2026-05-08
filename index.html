@@ -233,7 +233,7 @@
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }
-  .body { padding: 12px 14px 14px; }
+  .body { padding: 12px 14px 14px; position: relative; }
   .name {
     font-family: 'EB Garamond', serif;
     font-size: 18px;
@@ -762,7 +762,6 @@
     margin-bottom: 8px;
   }
   .tag-row .tag { margin-right: 0; }
-  .badge-wrap { position: relative; display: inline-flex; }
 
   /* Confidence badges */
   .badge {
@@ -788,14 +787,13 @@
   .tooltip {
     position: absolute;
     bottom: calc(100% + 8px);
+    left: 0;
     right: 0;
     z-index: 5;
     background: var(--surface-2);
     border: 1px solid var(--line);
     border-radius: 6px;
     padding: 12px 14px;
-    width: 280px;
-    max-width: calc(100vw - 48px);
     font-size: 11px;
     color: var(--ink);
     line-height: 1.5;
@@ -1084,7 +1082,7 @@ const colors = [
   { name: "Carmon Red Metallic", code: "M3W / 8B1 / 8B2", type: "metallic", years: "2003–2004", hex: "#7C2330", family: "red",
     sources: ["986p","ATU03","ATU04"], conflicts: ["986porsche calls it 'Carmona'; PaintScratch and AutomotiveTouchup both call it 'Carmon'. Latter is consensus."] },
   // Greens
-  { name: "Ocean Jade Metallic / Libel Turquoise", code: "25K/25H", type: "metallic", years: "1997–1999", hex: "#4A8A85", family: "green",
+  { name: "Ocean Jade Metallic", code: "25K/25H", type: "metallic", years: "1997–1999", hex: "#4A8A85", family: "green",
     sources: ["986p","Auto98","PCA","986F"], conflicts: ["986porsche calls it 'Libel Turquoise'; the 1998 Porsche dealer sheet and PCA call it 'Ocean Jade Metallic' (or 'Ocean Metallic Jade'). Likely the same color, two names. PCA notes it as a 'unicorn color'."] },
   { name: "Wimbledon Green Metallic", code: "2B6/23I", type: "metallic", years: "1999–2001", hex: "#2D4A2A", family: "green",
     sources: ["986p","ATU00"], conflicts: [] },
@@ -1329,12 +1327,10 @@ function colorCard(c) {
         <div class="tag-row">
           <span class="tag ${c.type}">${c.type}</span>
           ${c.special ? '<span class="tag special">Special</span>' : ''}
-          <span class="badge-wrap">
-            <button class="badge badge-${conf}" type="button" aria-label="${BADGE_LABEL[conf]}" title="${BADGE_LABEL[conf]} — click for details">${BADGE[conf]}</button>
-            <div class="tooltip">${tooltipHtml}</div>
-          </span>
+          <button class="badge badge-${conf}" type="button" aria-label="${BADGE_LABEL[conf]}" title="${BADGE_LABEL[conf]} — click for details">${BADGE[conf]}</button>
         </div>
         <a class="photo-link" href="#" data-name="${attr(c.name)}" data-query="${attr(q)}" data-meta="${attr(meta)}">View gallery →</a>
+        <div class="tooltip">${tooltipHtml}</div>
       </div>
     </div>`;
 }
@@ -1796,7 +1792,7 @@ document.addEventListener('click', (e) => {
   const badge = e.target.closest('.badge');
   if (badge) {
     e.stopPropagation();
-    const tt = badge.parentElement.querySelector('.tooltip');
+    const tt = badge.closest('.body').querySelector('.tooltip');
     document.querySelectorAll('.tooltip.open').forEach(other => { if (other !== tt) other.classList.remove('open'); });
     if (tt) tt.classList.toggle('open');
     return;
