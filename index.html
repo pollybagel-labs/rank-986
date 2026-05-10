@@ -1158,17 +1158,18 @@ const STORE_KEY_WHEELS = "porsche986_wheel_rank";
 const STORE_KEY_PINNED  = "porsche986_pinned_images";
 const STORE_KEY_HIDDEN  = "porsche986_hidden";
 // Bump this version when the demo asset/color changes so existing visitors re-see the new demo.
-const STORE_KEY_DEMO_SEEDED = "porsche986_demo_pin_seeded_v2";
+const STORE_KEY_DEMO_SEEDED = "porsche986_demo_pin_seeded_v3";
 
 // First-load demo: pre-pin one chip so the photo-pinning feature is visible without explanation.
-// Image: CC BY-SA 4.0, photographer Damian B Oh — https://commons.wikimedia.org/wiki/File:1997_Porsche_986_Boxster_(7).jpg
+// Image: CC BY 3.0 + GFDL, uploaded by Wikimedia user 293 — https://commons.wikimedia.org/wiki/File:Silver_Porsche-986_Boxster_S_in_Lahaina,_Hawaii.jpg
 // Seeded once per browser; if the visitor unpins it, it does NOT come back. Reset clears the flag too.
-const DEMO_PIN_COLOR = "Guards Red";
-const DEMO_PIN_URL = "/assets/demo-pin-986-guards-red.jpg";
+const DEMO_PIN_COLOR = "Arctic Silver Metallic";
+const DEMO_PIN_URL = "/assets/demo-pin-986-arctic-silver.jpg";
 
 // Old demo pins from prior versions — clean these up on load so we don't leave 404s in localStorage.
 const OLD_DEMO_PINS = [
-  { color: "Wimbledon Green Metallic", url: "/assets/demo-pin-986-green.jpg" }
+  { color: "Wimbledon Green Metallic", url: "/assets/demo-pin-986-green.jpg" },
+  { color: "Guards Red", url: "/assets/demo-pin-986-guards-red.jpg" }
 ];
 
 function seedDemoPin() {
@@ -1403,6 +1404,26 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// Slot the demo-pinned color into the Nth visible position so its real photo
+// shows up where new visitors will see it. "Visible" counts verified items only
+// (the default filter is verified-only) so the demo lands at the intended slot
+// regardless of where unverified colors fell in the shuffle.
+function lockDemoPosition(arr, demoName, position) {
+  const idx = arr.findIndex(c => c.name === demoName);
+  if (idx === -1) return arr;
+  const [demo] = arr.splice(idx, 1);
+  let verifiedSeen = 0;
+  let insertAt = arr.length;
+  for (let i = 0; i < arr.length; i++) {
+    if (confidence(arr[i]) === 3) {
+      verifiedSeen++;
+      if (verifiedSeen >= position - 1) { insertAt = i + 1; break; }
+    }
+  }
+  arr.splice(insertAt, 0, demo);
+  return arr;
 }
 
 function renderRanks(gridId) {
@@ -1850,7 +1871,9 @@ document.getElementById('upload-input').addEventListener('change', async (e) => 
 function init() {
   seedDemoPin();
   const savedColors = JSON.parse(localStorage.getItem(STORE_KEY_COLORS) || 'null');
-  const orderedColors = savedColors ? applyOrder(colors, savedColors) : shuffle(colors);
+  const orderedColors = savedColors
+    ? applyOrder(colors, savedColors)
+    : lockDemoPosition(shuffle(colors), DEMO_PIN_COLOR, 4);
   document.getElementById('color-grid').innerHTML = orderedColors.map(colorCard).join('');
   renderRanks('color-grid');
   updateColorCount();

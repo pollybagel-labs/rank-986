@@ -113,7 +113,7 @@ If Bing eventually rate-limits the function, swap to Brave Search API or SerpAPI
 
 - **Color data**: 986porsche.com, [PaintScratch](https://www.paintscratch.com/touch_up_paint/Porsche/Boxster.html), [AutomotiveTouchup](https://www.automotivetouchup.com/touch-up-paint/porsche/), [PCA "Unicorn Colors"](https://www.pca.org/news/unicorn-colors-the-porsche-986-996-edition), 1998 Porsche dealer options sheet via Autopedia
 - **Image search**: Bing (scraped HTML, no API key)
-- **Demo-pin photo** (`assets/demo-pin-986-guards-red.jpg`): [1997 Porsche 986 Boxster (Guards Red)](https://commons.wikimedia.org/wiki/File:1997_Porsche_986_Boxster_(7).jpg) by Damian B Oh, licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+- **Demo-pin photo** (`assets/demo-pin-986-arctic-silver.jpg`): [Silver Porsche-986 Boxster S in Lahaina, Hawaii](https://commons.wikimedia.org/wiki/File:Silver_Porsche-986_Boxster_S_in_Lahaina,_Hawaii.jpg), licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) + GFDL
 - **Wordmark font**: [911 Porscha](https://www.dafont.com/911porscha.font) — free for non-commercial use
 - **Body type**: EB Garamond + Satoshi
 - **Drag-and-drop**: [SortableJS](https://github.com/SortableJS/Sortable)
