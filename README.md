@@ -94,6 +94,7 @@ The list of "37 colors" you find on a single Porsche enthusiast site is rarely f
 2. **Editorial / enthusiast archives** (986porsche.com, Stuttcars, model-specific blogs) — narrative context
 3. **Owner forums + clubs** (PCA articles, 986 Forum, Rennlist) — real-world confirmation, "unicorn color" callouts
 4. **Original dealer brochures / options sheets** (when you can find them) — closest to ground truth
+5. **Field verification** (you, in person, with a car in front of you) — eyewitness, not documentary. Honest provenance: appears in tooltips as `Field-verified — <initials> in person` so anyone reading can see it's an eyewitness source distinct from the documentary ones.
 
 Confidence ratings: 3+ source types confirming = ✓✓✓. 2 = ✓✓. 1 = `!` (don't trust without further verification).
 
