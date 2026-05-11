@@ -1,0 +1,327 @@
+{
+  "meta": {
+    "source_primary": "Porsche AG factory paint reference, section 3.3.9 'Lackfarben - Porsche 986 Boxster (ab 1997)', Printed in Germany 2002",
+    "source_secondary": "Stuttcars '986 Paint Colors (Exterior & Interior)' English-name overview",
+    "scope": "Porsche 986 Boxster, MY 1997-2004, exterior paint only",
+    "last_updated": "2026-05-10",
+    "color_count": 37,
+    "paint_system_codes": {
+      "U": "Uni (solid)",
+      "M": "Metallic",
+      "P": "Perlcolor (pearl)",
+      "W": "Wasserbasis (waterborne basecoat)",
+      "1": "Einschichtverfahren (single-stage)",
+      "2": "Zweischichtverfahren (two-stage)",
+      "note": "Pre-MY02 cars used split codes (W* for waterborne shops, non-W for solvent shops). MY02+ unified to a single code per color."
+    }
+  },
+  "colors": [
+    {
+      "name_en": "Arctic Silver Metallic",
+      "aliases_en": [],
+      "name_de": "arktissilber-met.",
+      "codes": ["92U", "92T"],
+      "finish": "metallic",
+      "years": [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "Arena Red Pearl",
+      "aliases_en": [],
+      "name_de": "arenarot-met.",
+      "codes": ["84S", "84R"],
+      "finish": "pearl",
+      "years": [1997, 1998, 1999, 2000]
+    },
+    {
+      "name_en": "Atlas Grey Metallic",
+      "aliases_en": [],
+      "name_de": "atlasgrau met.",
+      "codes": ["M7X"],
+      "finish": "metallic",
+      "years": [2004]
+    },
+    {
+      "name_en": "Basalt Black Metallic",
+      "aliases_en": [],
+      "name_de": "basaltschwarz met.",
+      "codes": ["C9Z"],
+      "finish": "metallic",
+      "years": [2002, 2003, 2004]
+    },
+    {
+      "name_en": "Biarritz White",
+      "aliases_en": [],
+      "name_de": "biarritzweiß",
+      "codes": ["9A2", "9A3"],
+      "finish": "solid",
+      "years": [2000, 2001]
+    },
+    {
+      "name_en": "Black",
+      "aliases_en": [],
+      "name_de": "schwarz",
+      "codes": ["741", "747", "041"],
+      "finish": "solid",
+      "years": [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "Black Metallic",
+      "aliases_en": [],
+      "name_de": "schwarz-met.",
+      "codes": ["744", "746"],
+      "finish": "metallic",
+      "years": [1997, 1998, 1999, 2000, 2001],
+      "note": "Distinct color from Basalt Black Metallic (C9Z), which succeeded it MY02-04."
+    },
+    {
+      "name_en": "Blue Turquoise",
+      "aliases_en": [],
+      "name_de": "blautürkis",
+      "codes": ["3AS", "3AR"],
+      "finish": "solid",
+      "years": [1997, 1998]
+    },
+    {
+      "name_en": "Carmona Red Metallic",
+      "aliases_en": ["Carmon Red Metallic"],
+      "name_de": "carmonarot met.",
+      "codes": ["M3W"],
+      "finish": "metallic",
+      "years": [2004],
+      "note": "Factory German 'carmonarot' confirms Carmona (Andalusian town) naming. Vendor 'Carmon Red' is a transcription error."
+    },
+    {
+      "name_en": "Carrara White",
+      "aliases_en": [],
+      "name_de": "carraraweiß",
+      "codes": ["B9A"],
+      "finish": "solid",
+      "years": [2002, 2003, 2004]
+    },
+    {
+      "name_en": "Cobalt Blue Metallic",
+      "aliases_en": [],
+      "name_de": "cobaltblau-met.",
+      "codes": ["3C8", "37U"],
+      "finish": "metallic",
+      "years": [1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "Dark Blue",
+      "aliases_en": [],
+      "name_de": "dunkelblau",
+      "codes": ["3C7", "347"],
+      "finish": "solid",
+      "years": [1999, 2000, 2001]
+    },
+    {
+      "name_en": "Dark Teal Metallic",
+      "aliases_en": ["Lagoon Green Metallic", "Lago Green Metallic"],
+      "name_de": "lagogrün metallic",
+      "codes": ["M6W"],
+      "finish": "metallic",
+      "years": [2003, 2004]
+    },
+    {
+      "name_en": "Fayence Yellow",
+      "aliases_en": [],
+      "name_de": "fayencegelb",
+      "codes": ["1C1"],
+      "finish": "solid",
+      "years": [2004]
+    },
+    {
+      "name_en": "Forest Green Metallic",
+      "aliases_en": [],
+      "name_de": "tannengrün-met.",
+      "codes": ["2B4", "22E"],
+      "finish": "metallic",
+      "years": [1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "GT Silver Metallic",
+      "aliases_en": [],
+      "name_de": "GT-silber met.",
+      "codes": ["M7Z"],
+      "finish": "metallic",
+      "years": [2004],
+      "note": "MY04 only per factory doc — confirms LE-only theory. ATU listing for MY02/03 was wrong (cross-generation contamination)."
+    },
+    {
+      "name_en": "Guards Red",
+      "aliases_en": [],
+      "name_de": "indischrot",
+      "codes": ["84A", "80K"],
+      "finish": "solid",
+      "years": [1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "Iris Blue Pearl",
+      "aliases_en": ["Irisblau Pearl"],
+      "name_de": "irisblau-met.",
+      "codes": ["39V", "39N"],
+      "finish": "pearl",
+      "years": [1999, 2000]
+    },
+    {
+      "name_en": "Lapis Blue Metallic",
+      "aliases_en": ["Lapis Blue Pearl"],
+      "name_de": "lapisblau-met.",
+      "codes": ["3A8", "3A9"],
+      "finish": "pearl",
+      "years": [2001, 2002, 2003, 2004],
+      "note": "Factory doc lists 3A8 as WP2 (waterborne pearl 2-stage) and 3A9 as M2 (metallic). German name says 'met.' but system code says pearl. Vendor catalogs (PS) call it Pearl."
+    },
+    {
+      "name_en": "Libel Turquoise Metallic",
+      "aliases_en": [],
+      "name_de": "libelltürkis-met.",
+      "codes": ["25K", "25H"],
+      "finish": "metallic",
+      "years": [1997, 1998, 1999]
+    },
+    {
+      "name_en": "Meridian Metallic",
+      "aliases_en": [],
+      "name_de": "meridian-met.",
+      "codes": ["6A6", "6A7"],
+      "finish": "metallic",
+      "years": [2001, 2002, 2003, 2004],
+      "note": "ATU 1997-2000 listings for this code are wrong — factory says MY01 introduction."
+    },
+    {
+      "name_en": "Midnight Blue Metallic",
+      "aliases_en": ["Dark Blue Pearl", "Nachtblau Pearl"],
+      "name_de": "nachtblau-met.",
+      "codes": ["39C", "37W"],
+      "finish": "pearl",
+      "years": [1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "Mirage Pearl",
+      "aliases_en": ["Paladio Pearl"],
+      "name_de": "paladio-met.",
+      "codes": ["555", "554"],
+      "finish": "pearl",
+      "years": [1998, 1999, 2000],
+      "note": "Factory confirms existence + code + year (was single-source on 986porsche.com). English name 'Mirage Pearl' is editorial — factory German is paladio-met."
+    },
+    {
+      "name_en": "Ocean Blue Metallic",
+      "aliases_en": [],
+      "name_de": "oceanblau-met.",
+      "codes": ["3AZ", "3AY"],
+      "finish": "metallic",
+      "years": [1997, 1998, 1999, 2000]
+    },
+    {
+      "name_en": "Orient Red Metallic",
+      "aliases_en": [],
+      "name_de": "orientrot-met.",
+      "codes": ["8A3", "8A4"],
+      "finish": "metallic",
+      "years": [2002, 2003, 2004],
+      "note": "Factory says MY02-04, not 2001-2003 as prior matrix had. NOT to be confused with Zanzibar Red (1A8/1A9) — different color, different code."
+    },
+    {
+      "name_en": "Pastel Yellow",
+      "aliases_en": [],
+      "name_de": "pastellgelb",
+      "codes": ["12M", "12L"],
+      "finish": "solid",
+      "years": [1997, 1998, 1999]
+    },
+    {
+      "name_en": "Polar Silver Metallic",
+      "aliases_en": [],
+      "name_de": "polarsilber-met.",
+      "codes": ["92M", "92E"],
+      "finish": "metallic",
+      "years": [1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "Rainforest Green Metallic",
+      "aliases_en": ["Jungle Green Metallic"],
+      "name_de": "dschungelgrün-met.",
+      "codes": ["2A1", "2A2"],
+      "finish": "metallic",
+      "years": [2000, 2001, 2002],
+      "note": "Factory German 'dschungelgrün' = Jungle Green (direct translation). Market English Rainforest per vendor consensus."
+    },
+    {
+      "name_en": "Seal Grey Metallic",
+      "aliases_en": [],
+      "name_de": "sealgrau-met.",
+      "codes": ["6B4", "6B5"],
+      "finish": "metallic",
+      "years": [2001, 2002, 2003, 2004],
+      "note": "ATU 1997-2000 listings for this code are wrong — factory says MY01 introduction."
+    },
+    {
+      "name_en": "Slate Grey Metallic",
+      "aliases_en": [],
+      "name_de": "schiefer-met.",
+      "codes": ["23F", "22D"],
+      "finish": "metallic",
+      "years": [1999, 2000, 2001, 2002, 2003, 2004]
+    },
+    {
+      "name_en": "Snow White",
+      "aliases_en": ["Glacier White"],
+      "name_de": "firnweiß",
+      "codes": ["3AU", "3AT"],
+      "finish": "solid",
+      "years": [1997, 1998, 1999]
+    },
+    {
+      "name_en": "Speed Yellow",
+      "aliases_en": [],
+      "name_de": "speedgelb",
+      "codes": ["12H", "12G"],
+      "finish": "solid",
+      "years": [1999, 2000, 2001, 2002, 2003, 2004],
+      "note": "Factory says MY99 introduction, not MY97 as 986porsche.com claimed."
+    },
+    {
+      "name_en": "Vesuvio Metallic",
+      "aliases_en": ["Vesuvio Pearl"],
+      "name_de": "vesuvio-met.",
+      "codes": ["40X", "40W"],
+      "finish": "pearl",
+      "years": [1998, 1999, 2000]
+    },
+    {
+      "name_en": "Viola Metallic",
+      "aliases_en": [],
+      "name_de": "viola-met.",
+      "codes": ["3AE", "39G"],
+      "finish": "metallic",
+      "years": [1999, 2000, 2001]
+    },
+    {
+      "name_en": "Wimbledon Green Metallic",
+      "aliases_en": [],
+      "name_de": "wimbledongrün-met.",
+      "codes": ["2B6", "23I"],
+      "finish": "metallic",
+      "years": [1999, 2000, 2001]
+    },
+    {
+      "name_en": "Zanzibar Red",
+      "aliases_en": ["Pearl Orange-Red", "Orange Red Pearl"],
+      "name_de": "orangerot-perlcolor",
+      "codes": ["1A8", "1A9"],
+      "finish": "pearl",
+      "years": [2000, 2001, 2002, 2003],
+      "note": "NOT to be confused with Orient Red Metallic (8A3/8A4). Image search confuses these constantly."
+    },
+    {
+      "name_en": "Zenith Blue Metallic",
+      "aliases_en": [],
+      "name_de": "zenitblau-met.",
+      "codes": ["3AX", "3AW"],
+      "finish": "metallic",
+      "years": [1997, 1998, 1999, 2000]
+    }
+  ]
+}
